@@ -4,10 +4,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
 (function($) {
 
-    //TODO возможно лучше передалать в просто функцию
-    /* позволяет делать всякие такие штуки - "Hello {variable}".supplant({variable: "World !"}) */
-    String.prototype.supplant = function (o) {
-        return this.replace(/{([^{}]*)}/g,
+    /* позволяет делать всякие такие штуки - supplant("Hello {variable}", {variable: "World !"}) // return Hello World ! */
+    var supplant = function (str, o) {
+        return str.replace(/{([^{}]*)}/g,
             function (a, b) {
                 var r = o[b];
                 return typeof r === 'string' || typeof r === 'number' ? r : a;
@@ -19,12 +18,12 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         var $this = $(this),
             stream,
             o = $.extend({
-                NOT_SUPPORT_FEATURE: 'this browser does not support webcam capturing',
-                CAMERA_NOT_FOUND: 'camera not found on this device',
-                CLICK_TO_PAUSE: 'click to play/pause',
-                TAKE_SNAPSHOT: 'take snapshot',
-                CANCEL: 'cancel',
-                modal_class: 'modal',
+                NOT_SUPPORT_FEATURE: 'Этот браузер не поддерживает захват с камеры',
+                CAMERA_NOT_FOUND: 'Камера не найдена на этом устройстве',
+                CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
+                TAKE_SNAPSHOT: 'сделать снимок',
+                CANCEL: 'отмена',
+                modal_class: 'modal'
             },options),
             modal =
                 "<div class='{modal_class}' style='position:fixed; display: none;'>" +
@@ -32,7 +31,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     "<input type='button' name='snapshot' value='{snapshot}'/>" +
                     "<input type='button' name='cancel' value='{cancel}'/>" +
                 "</div>",
-            $modal = $(modal.supplant({
+            $modal = $(supplant(modal, {
                 pause: o.CLICK_TO_PAUSE, 
                 snapshot: o.TAKE_SNAPSHOT, 
                 cancel: o.CANCEL,
@@ -78,25 +77,3 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         });
     };
 })(jQuery);
-
-//$(document).on('click', 'button', function() {
-    //var modal = $('.snapshot_block');
-    //var video = modal.find('video.snapshot').get(0);
-
-    //navigator.getUserMedia && navigator.getUserMedia({video: true, audio: true}, function(stream) {
-        ////modal.modal();
-        ////modal.data('modal_show')();
-        ////modal.one('modal_cancel', function() { stream.stop(); })
-        ////modal.one('modal_ok', function() { 
-            ////var canvas = document.createElement('canvas');
-            ////var wh = getScaledWH(video.videoWidth, video.videoHeight, MAX_SIDE);
-            ////canvas.width = wh.w;
-            ////canvas.height = wh.h;
-            ////canvas.getContext('2d').drawImage(video, 0, 0, wh.w, wh.h);
-            ////showUcrop(canvas.toDataURL());
-            ////stream.stop(); 
-            ////modal.data('modal_hide')();
-        ////});
-        ////video.src = window.URL.createObjectURL(stream);
-    //}, function() { alert('you browser is shit'); });
-//});
