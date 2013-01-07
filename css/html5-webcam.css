@@ -1,0 +1,8 @@
+.modal {
+    top: 30px;
+    left: 40%;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 4px;
+    text-align: center;
+}
