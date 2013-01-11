@@ -15,12 +15,12 @@
     };
 
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, f_canvas;
+    var o, modal, $modal, base_canvas, darken_canvas, f_canvas;
+    var dots = {
+        lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
+        lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
+    };
 
-        var dots = {
-            lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
-            lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
-        };
 
     return {
         init: function(options) {
@@ -32,8 +32,9 @@ var html5Crop = (function() {
             }, options);
             modal = supplant(
                 "<div class='{modal_class}' style='position:fixed; display:none'>" +
-                    "<div>" +
+                    "<div style='position: relative'>" +
                         "<canvas></canvas>" +
+                        "<canvas style='position:absolute; top:0; left:0'></canvas>" +
                         "<canvas style='position:absolute; top:0; left:0'></canvas>" +
                     "</div>" +
                     "<input type='button' name='snapshot' value='{cropname}'/>" +
@@ -47,8 +48,9 @@ var html5Crop = (function() {
             $modal = $(modal);
 
             var $canvases = $modal.find('canvas');
-            base_canvas = $canvases[0];
-            f_canvas    = $canvases[1];
+            base_canvas   = $canvases[0];
+            darken_canvas = $canvases[1]
+            f_canvas      = $canvases[2];
             this.setUrl(o.url);
 
             $('body').append($modal);
@@ -59,19 +61,35 @@ var html5Crop = (function() {
             $img.on('load', function() { 
                 base_canvas.width = this.width;
                 base_canvas.height = this.height;
-                //base_canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height);
+                base_canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height);
+                darken_canvas.width  = this.width;
+                darken_canvas.height = this.height;
                 f_canvas.width = this.width;
                 f_canvas.height = this.height;
+
                 toCenter($modal);
                 $modal.show();
                 it.drawDots(f_canvas);
                 it.setActionHandlers(f_canvas);
             });
         },
-        drawDots: function(canvas) {
-            var ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            $.each(dots, function(i, dot) { ctx.fillRect(dot.x, dot.y, o.dot_side, o.dot_side); });
+        drawDots: function() {
+            var f_ctx = f_canvas.getContext('2d');
+            f_ctx.clearRect(0, 0, f_canvas.width, f_canvas.height);
+
+            f_ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            f_ctx.strokeStyle = '#000';
+
+            $.each(dots, function(i, dot) { 
+                f_ctx.fillRect(dot.x, dot.y, o.dot_side, o.dot_side); 
+                f_ctx.strokeRect(dot.x, dot.y, o.dot_side, o.dot_side); 
+            });
+
+            var d_ctx = darken_canvas.getContext('2d');
+            d_ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            d_ctx.clearRect(0, 0, f_canvas.width, f_canvas.height);
+            d_ctx.fillRect(0, 0, f_canvas.width, f_canvas.height);
+            d_ctx.clearRect(dots.lt.x + o.dot_side/2, dots.lt.y + o.dot_side/2, dots.rt.x - dots.lt.x, dots.lb.y - dots.lt.y);
         },
         moveArea: function(x, y, old_x, old_y) {
             var diff_x = old_x - x; 
