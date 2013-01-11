@@ -15,21 +15,21 @@
     };
 
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, darken_canvas, f_canvas;
+    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, base_callback, $btn_crop, $btn_cancel;
     var dots = {
         lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
         lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
     };
 
-
     return {
-        init: function(options) {
+        init: function(options, callback) {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 dot_side: 10,
                 modal_class: 'modal'
             }, options);
+            base_callback = callback;
             modal = supplant(
                 "<div class='{modal_class}' style='position:fixed; display:none'>" +
                     "<div style='position: relative'>" +
@@ -37,7 +37,7 @@ var html5Crop = (function() {
                         "<canvas style='position:absolute; top:0; left:0'></canvas>" +
                         "<canvas style='position:absolute; top:0; left:0'></canvas>" +
                     "</div>" +
-                    "<input type='button' name='snapshot' value='{cropname}'/>" +
+                    "<input type='button' name='crop' value='{cropname}'/>" +
                     "<input type='button' name='cancel' value='{cancel}'/>" +
                 "</div>", {
                     modal_class: o.modal_class,
@@ -46,12 +46,15 @@ var html5Crop = (function() {
                 }
             );
             $modal = $(modal);
+            $btn_crop = $modal.find('input[name=crop]');
+            $btn_cancel = $modal.find('input[name=cancel]');
 
             var $canvases = $modal.find('canvas');
             base_canvas   = $canvases[0];
             darken_canvas = $canvases[1]
             f_canvas      = $canvases[2];
             this.setUrl(o.url);
+            this.setButtonActions();
 
             $('body').append($modal);
         },
@@ -69,7 +72,7 @@ var html5Crop = (function() {
 
                 toCenter($modal);
                 $modal.show();
-                it.drawDots(f_canvas);
+                it.drawDots();
                 it.setActionHandlers(f_canvas);
             });
         },
@@ -99,7 +102,7 @@ var html5Crop = (function() {
                 dot.y = dot.y - diff_y;
             });
 
-            this.drawDots(f_canvas);
+            this.drawDots();
         },
         moveDot: function(x, y) {
             var dot;
@@ -111,7 +114,7 @@ var html5Crop = (function() {
             if (dot == dots.rt) { dots.lt.y = dot.y; dots.rb.x = dot.x; } 
             if (dot == dots.lb) { dots.lt.x = dot.x; dots.rb.y = dot.y; } 
 
-            this.drawDots(f_canvas);
+            this.drawDots();
         },
         setActionHandlers: function(canvas) {
             var it = this,
@@ -145,10 +148,6 @@ var html5Crop = (function() {
                 && (dots.lt.y < y && y < dots.lb.y + o.dot_side || dots.lb.y < y && y < dots.lt.y + o.dot_side )) {
 
                 target = 'area';
-            //} else if (dots.rt.x < x && x < dots.lt.x + o.dot_side 
-                //&& dots.lb.y < y && y < dots.lt.y + o.dot_side) {
-
-                //target = 'area';
             } else { 
                 return false;
             }
@@ -159,6 +158,17 @@ var html5Crop = (function() {
             });
 
             return target;
+        },
+        setButtonActions: function() {
+            $btn_crop.on('click', function() {
+                var im_data = base_canvas.getContext('2d').getImageData(0,0,100,100);
+                var canvas = document.createElement('canvas');
+                canvas.getContext('2d').putImageData(im_data, 0, 0);
+
+                var url = canvas.toDataURL();
+                base_callback(url);
+            });
         }
+
     }
 })();
