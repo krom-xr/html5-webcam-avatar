@@ -14,8 +14,10 @@
 
     };
 
+var dots;
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, f_canvas,
+    var o, modal, $modal, base_canvas, f_canvas;
+
         dots = {
             lt: {x: 0,   y: 0  },
             rt: {x: 100, y: 0  },
@@ -75,8 +77,6 @@ var html5Crop = (function() {
             $.each(dots, function(i, dot) { ctx.fillRect(dot.x, dot.y, o.dot_side, o.dot_side); });
         },
         moveArea: function(x, y, old_x, old_y) {
-            console.log(x, y, old_x, old_y);
-
             var diff_x = old_x - x; 
             var diff_y = old_y - y;
             $.each(dots, function(i, dot) {
@@ -84,6 +84,13 @@ var html5Crop = (function() {
                 dot.y = dot.y - diff_y;
             });
 
+            this.drawDots(f_canvas);
+        },
+        moveDot: function(x, y) {
+            var dot;
+            $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
+            dot.x = x;
+            dot.y = y;
             this.drawDots(f_canvas);
         },
         setActionHandlers: function(canvas) {
@@ -99,7 +106,7 @@ var html5Crop = (function() {
             $(canvas).on('mousemove', function(e) {
                 if (!target) { return false; }
                 if (target == 'dot') {
-                    it.moveDot();
+                    it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
                 } else if (target == 'area') {
                     it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
                     drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
@@ -110,7 +117,6 @@ var html5Crop = (function() {
                 drag_position = {x:0, y:0};
             });
         },
-        moveDot: function() {},
         getTarget: function(x, y) {
             var it = this;
             var target = false; // false, 'dot', 'area'
@@ -124,12 +130,11 @@ var html5Crop = (function() {
             }
 
             $.each(dots, function(i, dot) { 
-                dot.active = Boolean((dot[0] < x && x < (dot[0] + o.dot_side)) && (dot[1] < y && y < (dot[1] + o.dot_side)));
+                dot.active = Boolean((dot.x < x && x < (dot.x + o.dot_side)) && (dot.y < y && y < (dot.y + o.dot_side)));
                 target = !dot.active ? target : 'dot';
             });
 
             return target;
-
         }
     }
 })();
