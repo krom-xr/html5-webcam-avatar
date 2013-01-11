@@ -14,15 +14,12 @@
 
     };
 
-var dots;
 var html5Crop = (function() {
     var o, modal, $modal, base_canvas, f_canvas;
 
-        dots = {
-            lt: {x: 0,   y: 0  },
-            rt: {x: 100, y: 0  },
-            rb: {x: 100, y: 100},
-            lb: {x: 0,   y: 100}
+        var dots = {
+            lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
+            lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
         };
 
     return {
@@ -89,8 +86,13 @@ var html5Crop = (function() {
         moveDot: function(x, y) {
             var dot;
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
-            dot.x = x;
-            dot.y = y;
+            dot.x = x; dot.y = y;
+
+            if (dot == dots.lt) { dots.rt.y = dot.y; dots.lb.x = dot.x; } 
+            if (dot == dots.rb) { dots.rt.x = dot.x; dots.lb.y = dot.y; } 
+            if (dot == dots.rt) { dots.lt.y = dot.y; dots.rb.x = dot.x; } 
+            if (dot == dots.lb) { dots.lt.x = dot.x; dots.rb.y = dot.y; } 
+
             this.drawDots(f_canvas);
         },
         setActionHandlers: function(canvas) {
