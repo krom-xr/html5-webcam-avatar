@@ -52,7 +52,6 @@
 
         //$('body').append($modal);
         //$(f_canvas).on('mousedown', function(e, data) {
-            //console.log(e, data);
         //});
     //};
 
@@ -101,7 +100,8 @@ var html5Crop = (function() {
                 f_canvas.height = this.height;
                 toCenter($modal);
                 $modal.show();
-                it.drawDots(f_canvas)
+                it.drawDots(f_canvas);
+                it.setActionHandlers(f_canvas);
             });
         },
         dots: {
@@ -112,8 +112,66 @@ var html5Crop = (function() {
         },
         drawDots: function(canvas) {
             var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             var dots = this.dots;
             $.each(this.dots, function(i, dot) { ctx.fillRect(dot[0], dot[1], o.dot_side, o.dot_side); });
+        },
+        moveArea: function(x, y, old_x, old_y) {
+            console.log(x, y, old_x, old_y);
+
+            var diff_x = old_x - x; 
+            var diff_y = old_y - y;
+            $.each(this.dots, function(i, dot) {
+                dot[0] = dot[0] - diff_x;
+                dot[1] = dot[1] - diff_y;
+            });
+
+            this.drawDots(f_canvas);
+        },
+        setActionHandlers: function(canvas) {
+            var it = this,
+                target,
+                drag_position = [];
+
+            $(canvas).on('mousedown', function(e) {
+                target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
+                drag_position = [e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY];
+
+            });
+            $(canvas).on('mousemove', function(e) {
+                if (!target) { return false; }
+                if (target == 'dot') {
+                    it.moveDot();
+                } else if (target == 'area') {
+                    it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position[0], drag_position[1]);
+                    drag_position = [e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY];
+                }
+            });
+            $(canvas).on('mouseup', function() { 
+                target = false; 
+                drag_position = [0,0];
+            });
+        },
+        moveDot: function() {},
+        getTarget: function(x, y) {
+            var it = this;
+            var target = false; // false, 'dot', 'area'
+
+            if (it.dots.lt[0] < x && x < it.dots.rt[0] + o.dot_side 
+                && it.dots.lt[1] < y && y < it.dots.lb[1] + o.dot_side) {
+
+                target = 'area';
+            } else { 
+                return false;
+            }
+
+            $.each(it.dots, function(i, dot) { 
+                dot.active = Boolean((dot[0] < x && x < (dot[0] + o.dot_side)) && (dot[1] < y && y < (dot[1] + o.dot_side)));
+                target = !dot.active ? target : 'dot';
+            });
+
+            return target;
+
         }
     }
 })();
