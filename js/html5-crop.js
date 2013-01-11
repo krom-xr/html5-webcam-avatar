@@ -141,10 +141,14 @@ var html5Crop = (function() {
             var it = this;
             var target = false; // false, 'dot', 'area'
 
-            if (dots.lt.x < x && x < dots.rt.x + o.dot_side 
-                && dots.lt.y < y && y < dots.lb.y + o.dot_side) {
+            if ((dots.lt.x < x && x < dots.rt.x + o.dot_side || dots.rt.x < x && x < dots.lt.x + o.dot_side)
+                && (dots.lt.y < y && y < dots.lb.y + o.dot_side || dots.lb.y < y && y < dots.lt.y + o.dot_side )) {
 
                 target = 'area';
+            //} else if (dots.rt.x < x && x < dots.lt.x + o.dot_side 
+                //&& dots.lb.y < y && y < dots.lt.y + o.dot_side) {
+
+                //target = 'area';
             } else { 
                 return false;
             }
