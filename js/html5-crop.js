@@ -14,49 +14,14 @@
 
     };
 
-    //html5Crop = function(url, options) {
-        //var o = $.extend({
-                //CROP_NAME: 'обрезать',
-                //CANCEL: 'отмена',
-                //modal_class: 'modal'
-            //}, options),
-            //modal = supplant(
-                //"<div class='{modal_class}' style='position:fixed; display:none'>" +
-                    //"<div>" +
-                        //"<canvas></canvas>" +
-                        //"<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                    //"</div>" +
-                    //"<input type='button' name='snapshot' value='{cropname}'/>" +
-                    //"<input type='button' name='cancel' value='{cancel}'/>" +
-                //"</div>", {
-                    //modal_class: o.modal_class,
-                    //cropname: o.CROP_NAME,
-                    //cancel: o.CANCEL
-                //}
-            //),
-            //$modal = $(modal),
-            //$canvases = $modal.find('canvas'),
-            //base_canvas = $canvases[0],
-            //f_canvas    = $canvases[1],
-            //$img = $(supplant("<img src='{url}' >", {url: url}));
-
-        //$img.on('load', function() { 
-            //base_canvas.width = this.width;
-            //base_canvas.height = this.height;
-            //base_canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height);
-            //f_canvas.width = this.width;
-            //f_canvas.height = this.height;
-            //toCenter($modal);
-            //$modal.show();
-        //});
-
-        //$('body').append($modal);
-        //$(f_canvas).on('mousedown', function(e, data) {
-        //});
-    //};
-
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, f_canvas;
+    var o, modal, $modal, base_canvas, f_canvas,
+        dots = {
+            lt: {x: 0,   y: 0  },
+            rt: {x: 100, y: 0  },
+            rb: {x: 100, y: 100},
+            lb: {x: 0,   y: 100}
+        };
 
     return {
         init: function(options) {
@@ -104,26 +69,19 @@ var html5Crop = (function() {
                 it.setActionHandlers(f_canvas);
             });
         },
-        dots: {
-            lt: [0, 0],
-            rt: [100, 0],
-            rb: [100, 100],
-            lb: [0, 100]
-        },
         drawDots: function(canvas) {
             var ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            var dots = this.dots;
-            $.each(this.dots, function(i, dot) { ctx.fillRect(dot[0], dot[1], o.dot_side, o.dot_side); });
+            $.each(dots, function(i, dot) { ctx.fillRect(dot.x, dot.y, o.dot_side, o.dot_side); });
         },
         moveArea: function(x, y, old_x, old_y) {
             console.log(x, y, old_x, old_y);
 
             var diff_x = old_x - x; 
             var diff_y = old_y - y;
-            $.each(this.dots, function(i, dot) {
-                dot[0] = dot[0] - diff_x;
-                dot[1] = dot[1] - diff_y;
+            $.each(dots, function(i, dot) {
+                dot.x = dot.x - diff_x;
+                dot.y = dot.y - diff_y;
             });
 
             this.drawDots(f_canvas);
@@ -131,11 +89,11 @@ var html5Crop = (function() {
         setActionHandlers: function(canvas) {
             var it = this,
                 target,
-                drag_position = [];
+                drag_position; 
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
-                drag_position = [e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY];
+                drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
 
             });
             $(canvas).on('mousemove', function(e) {
@@ -143,13 +101,13 @@ var html5Crop = (function() {
                 if (target == 'dot') {
                     it.moveDot();
                 } else if (target == 'area') {
-                    it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position[0], drag_position[1]);
-                    drag_position = [e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY];
+                    it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
+                    drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
                 }
             });
             $(canvas).on('mouseup', function() { 
                 target = false; 
-                drag_position = [0,0];
+                drag_position = {x:0, y:0};
             });
         },
         moveDot: function() {},
@@ -157,15 +115,15 @@ var html5Crop = (function() {
             var it = this;
             var target = false; // false, 'dot', 'area'
 
-            if (it.dots.lt[0] < x && x < it.dots.rt[0] + o.dot_side 
-                && it.dots.lt[1] < y && y < it.dots.lb[1] + o.dot_side) {
+            if (dots.lt.x < x && x < dots.rt.x + o.dot_side 
+                && dots.lt.y < y && y < dots.lb.y + o.dot_side) {
 
                 target = 'area';
             } else { 
                 return false;
             }
 
-            $.each(it.dots, function(i, dot) { 
+            $.each(dots, function(i, dot) { 
                 dot.active = Boolean((dot[0] < x && x < (dot[0] + o.dot_side)) && (dot[1] < y && y < (dot[1] + o.dot_side)));
                 target = !dot.active ? target : 'dot';
             });
