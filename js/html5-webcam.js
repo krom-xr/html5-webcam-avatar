@@ -23,7 +23,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
                 TAKE_SNAPSHOT: 'сделать снимок',
                 CANCEL: 'отмена',
-                modal_class: 'modal'
+                modal_class: 'modal',
+                onsnapshot: function(snapshot) {}
+
             },options),
             modal =
                 "<div class='{modal_class}' style='position:fixed; display: none;'>" +
@@ -61,7 +63,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-            $this.trigger('webcam_snapshot', canvas.toDataURL());
+            o.onsnapshot(canvas.toDataURL());
+            //$this.trigger('webcam_snapshot', canvas.toDataURL());
             stream.stop();
             $modal.hide();
         });

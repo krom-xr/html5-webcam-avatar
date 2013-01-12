@@ -6,15 +6,15 @@
     <script src="js/html5-webcam.js"></script>
     <script>
         $(document).ready(function() {
-            $('button').html5WebCam();
-            $('button').on('webcam_snapshot', function(e, snapshot_url) {
-                html5Crop.init({
-                    url: snapshot_url,
-                    oncrop: function(cropped_url) {
-                        $("#cropped_img").attr('src', cropped_url);
-                    }
-                });
-
+            $('button').html5WebCam({
+                onsnapshot: function(snapshot_url) {
+                    html5Crop.init({
+                        url: snapshot_url,
+                        oncrop: function(cropped_url) {
+                            $("#cropped_img").attr('src', cropped_url);
+                        }
+                    });
+                }
             });
         });
     </script> 
