@@ -15,21 +15,21 @@
     };
 
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, base_callback, $btn_crop, $btn_cancel;
+    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel;
     var dots = {
         lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
         lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
     };
 
     return {
-        init: function(options, callback) {
+        init: function(options) {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 dot_side: 10,
-                modal_class: 'modal'
+                modal_class: 'modal',
+                oncrop: function(cropped_url) {}
             }, options);
-            base_callback = callback;
             modal = supplant(
                 "<div class='{modal_class}' style='position:fixed; display:none'>" +
                     "<div style='position: relative'>" +
@@ -168,7 +168,7 @@ var html5Crop = (function() {
                 canvas.getContext('2d').putImageData(im_data, 0, 0);
 
                 var url = canvas.toDataURL();
-                base_callback(url);
+                o.oncrop && o.oncrop(url);
                 $modal.hide();
             });
         }

@@ -8,23 +8,14 @@
         $(document).ready(function() {
             $('button').html5WebCam();
             $('button').on('webcam_snapshot', function(e, snapshot_url) {
-                console.log('wtf');
-                console.log(snapshot_url);
                 html5Crop.init({
-                        url: snapshot_url,
-                    }, function(resized) {
-                        $("#cropped_img").attr('src', resized);
+                    url: snapshot_url,
+                    oncrop: function(cropped_url) {
+                        $("#cropped_img").attr('src', cropped_url);
                     }
-                );
+                });
 
             });
-            //console.log($('button').html5WebCam());
-            //html5Crop.init({
-                    //url: "example_image.jpg",
-                //}, function(resized) {
-                    //$("#cropped_img").attr('src', resized);
-                //}
-            //);
         });
     </script> 
 </head>
