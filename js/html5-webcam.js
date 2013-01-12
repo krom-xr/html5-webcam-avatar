@@ -21,8 +21,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 NOT_SUPPORT_FEATURE: 'Этот браузер не поддерживает захват с камеры',
                 CAMERA_NOT_FOUND: 'Камера не найдена на этом устройстве',
                 CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
-                TAKE_SNAPSHOT: 'сделать снимок',
-                CANCEL: 'отмена',
+                TAKE_SNAPSHOT: 'Сделать снимок',
+                CANCEL: 'Отмена',
                 modal_class: 'modal',
                 onsnapshot: function(snapshot) {}
 
