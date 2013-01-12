@@ -75,5 +75,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 $modal.show();
             }, function() { alert(o.CAMERA_NOT_FOUND); });
         });
+
+        return $this;
     };
 })(jQuery);

@@ -161,12 +161,15 @@ var html5Crop = (function() {
         },
         setButtonActions: function() {
             $btn_crop.on('click', function() {
-                var im_data = base_canvas.getContext('2d').getImageData(0,0,100,100);
+                var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x + o.dot_side/2, dots.lt.y + o.dot_side/2, dots.rt.x - dots.lt.x, dots.lb.y - dots.lt.y);
                 var canvas = document.createElement('canvas');
+                canvas.width = Math.abs(dots.rt.x - dots.lt.x);
+                canvas.height = Math.abs(dots.lb.y - dots.lt.y);
                 canvas.getContext('2d').putImageData(im_data, 0, 0);
 
                 var url = canvas.toDataURL();
                 base_callback(url);
+                $modal.hide();
             });
         }
 
