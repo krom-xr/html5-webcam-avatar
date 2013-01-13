@@ -31,14 +31,16 @@ var html5Crop = (function() {
                 oncrop: function(cropped_url) {}
             }, options);
             modal = supplant(
-                "<div class='{modal_class}' style='position:fixed; display:none'>" +
-                    "<div style='position: relative'>" +
-                        "<canvas></canvas>" +
-                        "<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                        "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                "<div class='darken_bgr' style='display:none'>" +
+                    "<div class='{modal_class}' style='position:fixed;'>" +
+                        "<div style='position: relative'>" +
+                            "<canvas></canvas>" +
+                            "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                            "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                        "</div>" +
+                        "<input type='button' name='crop' value='{cropname}'/>" +
+                        "<input type='button' name='cancel' value='{cancel}'/>" +
                     "</div>" +
-                    "<input type='button' name='crop' value='{cropname}'/>" +
-                    "<input type='button' name='cancel' value='{cancel}'/>" +
                 "</div>", {
                     modal_class: o.modal_class,
                     cropname: o.CROP_NAME,
@@ -70,8 +72,8 @@ var html5Crop = (function() {
                 f_canvas.width = this.width;
                 f_canvas.height = this.height;
 
-                toCenter($modal);
                 $modal.show();
+                toCenter($modal.find("." + o.modal_class));
                 it.drawDots();
                 it.setActionHandlers(f_canvas);
             });
