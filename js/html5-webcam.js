@@ -28,11 +28,13 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             },options),
             modal =
-                "<div class='{modal_class}' style='position:fixed; display: none;'>" +
-                    "<div><video autoplay title='{pause}'></div>" +
-                    "<input type='button' name='snapshot' value='{snapshot}'/>" +
-                    "<input type='button' name='cancel' value='{cancel}'/>" +
-                "</div>",
+                "<div class='darken_bgr' style='display:none'>" +
+                    "<div class='{modal_class}' style='position:fixed;'>" +
+                        "<div><video autoplay title='{pause}'></div>" +
+                        "<input type='button' name='snapshot' value='{snapshot}'/>" +
+                        "<input type='button' name='cancel' value='{cancel}'/>" +
+                    "</div>" +
+                "</div>", 
             $modal = $(supplant(modal, {
                 pause: o.CLICK_TO_PAUSE, 
                 snapshot: o.TAKE_SNAPSHOT, 
@@ -48,9 +50,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
         $video.on('click', function() { video.paused ? video.play() : video.pause(); });
         $video.one('play', function() { 
-            $modal
-                .css('left', $(window).width()/2 + 'px')
-                .css('margin-left', -$modal.width()/2 + 'px');
+            toCenter($modal.find('.' + o.modal_class));
         });
 
         $btn_cancel.on('click', function() {
