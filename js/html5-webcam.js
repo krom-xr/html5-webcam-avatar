@@ -3,17 +3,6 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 (function($) {
-
-    /* позволяет делать всякие такие штуки - supplant("Hello {variable}", {variable: "World !"}) // return Hello World ! */
-    var supplant = function (str, o) {
-        return str.replace(/{([^{}]*)}/g,
-            function (a, b) {
-                var r = o[b];
-                return typeof r === 'string' || typeof r === 'number' ? r : a;
-            }
-        );
-    };
-    
     $.fn.html5WebCam = function(options) {
         var $this = $(this),
             stream,
