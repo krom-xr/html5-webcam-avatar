@@ -10,7 +10,7 @@ var html5Crop = (function() {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
-                square_mode: true,
+                //square_mode: true,
                 dot_side: 10,
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
@@ -92,6 +92,8 @@ var html5Crop = (function() {
             this.drawDots();
         },
         moveDot: function(x, y, old_x, old_y) {
+            x = x - o.dot_side/2;
+            y = y - o.dot_side/2;
             var dot;
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
             if (o.square_mode) {
