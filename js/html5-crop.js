@@ -106,19 +106,20 @@ var html5Crop = (function() {
             y = y - o.dot_side/2;
             var dot;
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
-            if (o.square_mode) {
-                if (dot == dots.lt || dot == dots.rb) {
-                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
-                } else {
-                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
-                }
-            }
+            //if (o.square_mode) {
+                //if (dot == dots.lt || dot == dots.rb) {
+                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
+                //} else {
+                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
+                //}
+            //}
 
-            dot.x = x; dot.y = y;
-            if (dot == dots.lt) { dots.rt.y = dot.y; dots.lb.x = dot.x; } 
-            if (dot == dots.rb) { dots.rt.x = dot.x; dots.lb.y = dot.y; } 
-            if (dot == dots.rt) { dots.lt.y = dot.y; dots.rb.x = dot.x; } 
-            if (dot == dots.lb) { dots.lt.x = dot.x; dots.rb.y = dot.y; } 
+            dot.x(x); dot.y(y);
+
+            if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
+            if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
+            if (dot == dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); } 
+            if (dot == dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); } 
 
             this.drawDots();
         },
@@ -158,7 +159,7 @@ var html5Crop = (function() {
             }
 
             $.each(dots, function(i, dot) { 
-                dot.active = Boolean((dot.x < x && x < (dot.x + o.dot_side)) && (dot.y < y && y < (dot.y + o.dot_side)));
+                dot.active = Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
                 target = !dot.active ? target : 'dot';
             });
 
