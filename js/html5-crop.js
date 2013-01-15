@@ -1,8 +1,18 @@
 var html5Crop = (function() {
     var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel;
+
+    var setDot = function(dot_name, value) {
+        var it = this;
+        it[dot_name] = value;
+        return function(value) {
+            it[dot_name] = value ? value : it[dot_name];
+            return it[dot_name];
+        }
+    }
+
     var dots = {
-        lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
-        lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
+        lt: {x: setDot('lt_x', 0),   y: setDot('lt_y', 0)  }, rt: {x: setDot('rt_x', 100), y: setDot('rt_y', 0)  },
+        lb: {x: setDot('lb_x', 0),   y: setDot('lb_y', 100)}, rb: {x: setDot('rb_x', 100), y: setDot('rb_y', 100)}
     };
 
     return {
@@ -71,15 +81,15 @@ var html5Crop = (function() {
             f_ctx.strokeStyle = '#000';
 
             $.each(dots, function(i, dot) { 
-                f_ctx.fillRect(dot.x, dot.y, o.dot_side, o.dot_side); 
-                f_ctx.strokeRect(dot.x, dot.y, o.dot_side, o.dot_side); 
+                f_ctx.fillRect(dot.x(), dot.y(), o.dot_side, o.dot_side); 
+                f_ctx.strokeRect(dot.x(), dot.y(), o.dot_side, o.dot_side); 
             });
 
             var d_ctx = darken_canvas.getContext('2d');
             d_ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             d_ctx.clearRect(0, 0, f_canvas.width, f_canvas.height);
             d_ctx.fillRect(0, 0, f_canvas.width, f_canvas.height);
-            d_ctx.clearRect(dots.lt.x + o.dot_side/2, dots.lt.y + o.dot_side/2, dots.rt.x - dots.lt.x, dots.lb.y - dots.lt.y);
+            d_ctx.clearRect(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
         },
         moveArea: function(x, y, old_x, old_y) {
             var diff_x = old_x - x; 
@@ -115,8 +125,7 @@ var html5Crop = (function() {
         setActionHandlers: function(canvas) {
             var it = this,
                 target,
-                drag_position,
-                dot_position; 
+                drag_position;
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
