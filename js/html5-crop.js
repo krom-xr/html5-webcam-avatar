@@ -10,8 +10,10 @@ var html5Crop = (function() {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
-                //square_mode: true,
+                square_mode: false,
                 dot_side: 10,
+                max_side: 300, // false
+                min_side: 100, // false
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
             }, options);
@@ -94,15 +96,15 @@ var html5Crop = (function() {
         moveDot: function(x, y, old_x, old_y) {
             x = x - o.dot_side/2;
             y = y - o.dot_side/2;
-            var dot;
+            var dot = detect(dots, function(_dot) { return _dot.active; });
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
-            if (o.square_mode) {
-                if (dot == dots.lt || dot == dots.rb) {
-                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
-                } else {
-                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
-                }
-            }
+            //if (o.square_mode) {
+                //if (dot == dots.lt || dot == dots.rb) {
+                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
+                //} else {
+                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
+                //}
+            //}
 
             dot.x = x; dot.y = y;
             if (dot == dots.lt) { dots.rt.y = dot.y; dots.lb.x = dot.x; } 
