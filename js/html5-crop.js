@@ -106,13 +106,13 @@ var html5Crop = (function() {
             y = y - o.dot_side/2;
             var dot;
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
-            //if (o.square_mode) {
-                //if (dot == dots.lt || dot == dots.rb) {
-                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
-                //} else {
-                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
-                //}
-            //}
+            if (o.square_mode) {
+                if (dot == dots.lt || dot == dots.rb) {
+                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
+                } else {
+                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
+                }
+            }
 
             dot.x(x); dot.y(y);
 
@@ -167,10 +167,10 @@ var html5Crop = (function() {
         },
         setButtonActions: function() {
             $btn_crop.on('click', function() {
-                var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x + o.dot_side/2, dots.lt.y + o.dot_side/2, dots.rt.x - dots.lt.x, dots.lb.y - dots.lt.y);
+                var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
                 var canvas = document.createElement('canvas');
-                canvas.width = Math.abs(dots.rt.x - dots.lt.x);
-                canvas.height = Math.abs(dots.lb.y - dots.lt.y);
+                canvas.width = Math.abs(dots.rt.x() - dots.lt.x());
+                canvas.height = Math.abs(dots.lb.y() - dots.lt.y());
                 canvas.getContext('2d').putImageData(im_data, 0, 0);
 
                 var url = canvas.toDataURL();
