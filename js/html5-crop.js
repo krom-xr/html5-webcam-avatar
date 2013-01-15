@@ -107,10 +107,17 @@ var html5Crop = (function() {
             //}
 
             dot.x = x; dot.y = y;
-            if (dot == dots.lt) { dots.rt.y = dot.y; dots.lb.x = dot.x; } 
-            if (dot == dots.rb) { dots.rt.x = dot.x; dots.lb.y = dot.y; } 
-            if (dot == dots.rt) { dots.lt.y = dot.y; dots.rb.x = dot.x; } 
-            if (dot == dots.lb) { dots.lt.x = dot.x; dots.rb.y = dot.y; } 
+            if (dot == dots.lt) { dots.rt.y = y; dots.lb.x = x; }
+            if (dot == dots.rb) { dots.rt.x = x; dots.lb.y = y; }
+            if (dot == dots.rt) { dots.lt.y = y; dots.rb.x = x; }
+            if (dot == dots.lb) { dots.lt.x = x; dots.rb.y = y; }
+
+            if (o.max_side || o.min_side) {
+                var side_one = Math.sqrt(Math.pow(dots.lt.x - dots.rt.x, 2) + Math.pow(dots.lt.y - dots.rt.y, 2));
+                if (side_one >= o.max_side) {
+                    return false;
+                }
+            }
 
             this.drawDots();
         },
