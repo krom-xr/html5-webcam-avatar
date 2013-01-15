@@ -10,6 +10,7 @@ var html5Crop = (function() {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
+                square_mode: true,
                 dot_side: 10,
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
@@ -37,7 +38,7 @@ var html5Crop = (function() {
 
             var $canvases = $modal.find('canvas');
             base_canvas   = $canvases[0];
-            darken_canvas = $canvases[1]
+            darken_canvas = $canvases[1];
             f_canvas      = $canvases[2];
             this.setUrl(o.url);
             this.setButtonActions();
@@ -90,11 +91,18 @@ var html5Crop = (function() {
 
             this.drawDots();
         },
-        moveDot: function(x, y) {
+        moveDot: function(x, y, old_x, old_y) {
             var dot;
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
-            dot.x = x; dot.y = y;
+            if (o.square_mode) {
+                if (dot == dots.lt || dot == dots.rb) {
+                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
+                } else {
+                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
+                }
+            }
 
+            dot.x = x; dot.y = y;
             if (dot == dots.lt) { dots.rt.y = dot.y; dots.lb.x = dot.x; } 
             if (dot == dots.rb) { dots.rt.x = dot.x; dots.lb.y = dot.y; } 
             if (dot == dots.rt) { dots.lt.y = dot.y; dots.rb.x = dot.x; } 
@@ -105,7 +113,8 @@ var html5Crop = (function() {
         setActionHandlers: function(canvas) {
             var it = this,
                 target,
-                drag_position; 
+                drag_position,
+                dot_position; 
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
@@ -115,7 +124,7 @@ var html5Crop = (function() {
             $(canvas).on('mousemove', function(e) {
                 if (!target) { return false; }
                 if (target == 'dot') {
-                    it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
+                    it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
                 } else if (target == 'area') {
                     it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
                     drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
@@ -123,7 +132,6 @@ var html5Crop = (function() {
             });
             $(canvas).on('mouseup', function() { 
                 target = false; 
-                drag_position = {x:0, y:0};
             });
         },
         getTarget: function(x, y) {
