@@ -95,8 +95,8 @@ var html5Crop = (function() {
             var diff_x = old_x - x; 
             var diff_y = old_y - y;
             $.each(dots, function(i, dot) {
-                dot.x = dot.x - diff_x;
-                dot.y = dot.y - diff_y;
+                dot.x(dot.x() - diff_x);
+                dot.y(dot.y() - diff_y);
             });
 
             this.drawDots();
@@ -149,8 +149,8 @@ var html5Crop = (function() {
             var it = this;
             var target = false; // false, 'dot', 'area'
 
-            if ((dots.lt.x < x && x < dots.rt.x + o.dot_side || dots.rt.x < x && x < dots.lt.x + o.dot_side)
-                && (dots.lt.y < y && y < dots.lb.y + o.dot_side || dots.lb.y < y && y < dots.lt.y + o.dot_side )) {
+            if ((dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side)
+                && (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side )) {
 
                 target = 'area';
             } else { 
