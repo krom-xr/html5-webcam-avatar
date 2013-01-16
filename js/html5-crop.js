@@ -53,6 +53,20 @@ var html5Crop = (function() {
         return {dot: dot, compass: compass , limit: limit}
     }
 
+    var checkYOutOfBorders = function() {
+        var min_limit = - o.dot_side/2,
+            max_limit = base_canvas.height - o.dot_side/2,
+            dot = detect(dots, function(dot) {
+                return dot.y() <= min_limit || dot.y() > max_limit;
+            });
+
+        if (!dot) { return false; }
+        var compass = dot.y() <= 0 ? 'north' : 'south',
+            limit = compass == 'north' ? min_limit: max_limit;
+
+        return {dot: dot, compass: compass , limit: limit}
+    }
+
     return {
         init: function(options) {
             o = $.extend({
@@ -138,17 +152,28 @@ var html5Crop = (function() {
                 dot.x(dot.x() - diff_x);
                 dot.y(dot.y() - diff_y);
             });
+
             var out_x = checkXOutOfBorders();
             if (out_x) {
                 var xside = getSideX(out_x.dot, out_x.dot.x());
-                console.log(out_x);
                 if (out_x.compass == 'west') { 
                     dots.lt.x(out_x.limit);         dots.lb.x(out_x.limit);
                     dots.rt.x(out_x.limit + xside); dots.rb.x(out_x.limit + xside);
                 } else {
-                    console.log('else');
                     dots.rt.x(out_x.limit);         dots.rb.x(out_x.limit);
                     dots.lt.x(out_x.limit - xside); dots.lb.x(out_x.limit - xside);
+                }
+            }
+
+            var out_y = checkYOutOfBorders();
+            if (out_y) {
+                var yside = getSideY(out_y.dot, out_y.dot.y());
+                if (out_y.compass == 'north') { 
+                    dots.lt.y(out_y.limit);         dots.rt.y(out_y.limit);
+                    dots.lb.y(out_y.limit + yside); dots.rb.y(out_y.limit + yside);
+                } else {
+                    dots.lb.y(out_y.limit);         dots.rb.y(out_y.limit);
+                    dots.lt.y(out_y.limit - yside); dots.rt.y(out_y.limit - yside);
                 }
             }
 
