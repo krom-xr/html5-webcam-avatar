@@ -39,13 +39,18 @@ var html5Crop = (function() {
         var y2 = (dots.lt == dot || dots.rt == dot) ? dots.lb.y() : dots.lt.y();
         return Math.abs(y1-y2);
     };
-    var checkOutOfBorders = function() {
-        var dot = detect(dots, function(dot) {
-            return dot.x() <= 0 || dot.x() > base_canvas.width;
-        });
-        return dot;
+    var checkXOutOfBorders = function() {
+        var min_limit = - o.dot_side/2,
+            max_limit = base_canvas.width - o.dot_side/2,
+            dot = detect(dots, function(dot) {
+                return dot.x() <= min_limit || dot.x() > max_limit;
+            });
+
         if (!dot) { return false; }
-        return {dot: dot, compass: dot.x() <= 0 ? 'west' : 'east'}
+        var compass = dot.x() <= 0 ? 'west' : 'east',
+            limit = compass == 'west' ? min_limit: max_limit;
+
+        return {dot: dot, compass: compass , limit: limit}
     }
 
     return {
@@ -133,18 +138,17 @@ var html5Crop = (function() {
                 dot.x(dot.x() - diff_x);
                 dot.y(dot.y() - diff_y);
             });
-            var dotx = checkOutOfBorders();
-            if (dotx) {
-                if (dotx == dots.lt || dotx == dots.lb) { 
-                    var xside = getSideX(dotx, dotx.x());
-                    dots.lt.x(0); dots.lb.x(0);
-                    dots.rt.x(dots.lt.x() + xside);
-                    dots.rb.x(dots.lt.x() + xside);
+            var out_x = checkXOutOfBorders();
+            if (out_x) {
+                var xside = getSideX(out_x.dot, out_x.dot.x());
+                console.log(out_x);
+                if (out_x.compass == 'west') { 
+                    dots.lt.x(out_x.limit);         dots.lb.x(out_x.limit);
+                    dots.rt.x(out_x.limit + xside); dots.rb.x(out_x.limit + xside);
                 } else {
-                    var xside = getSideX(dotx, dotx.x());
-                    dots.rt.x(base_canvas.width); dots.rb.x(base_canvas.width);
-                    dots.lt.x(dots.rt.x() - xside);
-                    dots.lb.x(dots.rt.x() - xside);
+                    console.log('else');
+                    dots.rt.x(out_x.limit);         dots.rb.x(out_x.limit);
+                    dots.lt.x(out_x.limit - xside); dots.lb.x(out_x.limit - xside);
                 }
             }
 
