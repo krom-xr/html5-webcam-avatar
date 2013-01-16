@@ -1,10 +1,12 @@
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel;
+    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel, freeze_x, freeze_y;
 
     var setDot = function(dot_name, value) {
         var it = this;
         it[dot_name] = value;
         return function(value) {
+            if (freeze_x && $.inArray(dot_name, ['lt_x', 'lb_x', 'rt_x', 'rb_x']) != -1) { return it[dot_name]; }
+            if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
             it[dot_name] = value ? value : it[dot_name];
             return it[dot_name];
         }
@@ -12,7 +14,30 @@ var html5Crop = (function() {
 
     var dots = {
         lt: {x: setDot('lt_x', 0),   y: setDot('lt_y', 0)  }, rt: {x: setDot('rt_x', 100), y: setDot('rt_y', 0)  },
-        lb: {x: setDot('lb_x', 0),   y: setDot('lb_y', 100)}, rb: {x: setDot('rb_x', 100), y: setDot('rb_y', 100)}
+        lb: {x: setDot('lb_x', 0),   y: setDot('lb_y', 100)}, rb: {x: setDot('rb_x', 100), y: setDot('rb_y', 100)},
+
+    };
+
+    var getXLimit = function(dot, limit_size) {
+        return dot == dots.lt || dot == dots.lb
+            ? dots.rt.x() - limit_size : dots.lt.x() + limit_size;
+    };
+
+    var getYLimit= function(dot, limit_size) {
+        return dot == dots.lt || dot == dots.rt
+            ? dots.lb.y() - limit_size : dots.lt.y() + limit_size;
+    };
+
+    var getSideX = function(dot, x) {
+        var x1 = x;
+        var x2 = (dots.lt == dot || dots.lb == dot) ? dots.rt.x() : dots.lt.x();
+        return Math.abs(x1-x2);
+    };
+
+    var getSideY = function(dot, y) {
+        var y1 = y;
+        var y2 = (dots.lt == dot || dots.rt == dot) ? dots.lb.y() : dots.lt.y();
+        return Math.abs(y1-y2);
     };
 
     return {
@@ -21,6 +46,7 @@ var html5Crop = (function() {
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 //square_mode: true,
+                max_side: 200,
                 dot_side: 10,
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
@@ -106,20 +132,29 @@ var html5Crop = (function() {
             y = y - o.dot_side/2;
             var dot;
             $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
-            if (o.square_mode) {
-                if (dot == dots.lt || dot == dots.rb) {
-                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
-                } else {
-                    if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
-                }
-            }
+            //if (o.square_mode) {
+                //if (dot == dots.lt || dot == dots.rb) {
+                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
+                //} else {
+                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
+                //}
+            //}
 
             dot.x(x); dot.y(y);
+            if (o.max_side || o.min_side) {
+                
+                if (getSideX(dot, x) >= o.max_side) { dot.x(getXLimit(dot, o.max_side)); } 
+                if (getSideY(dot, y) >= o.max_side) { dot.y(getYLimit(dot, o.max_side)); } 
+            }
+
 
             if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
             if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
             if (dot == dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); } 
             if (dot == dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); } 
+
+            //freeze_x = false;
+            //freeze_y = false;
 
             this.drawDots();
         },
@@ -144,6 +179,7 @@ var html5Crop = (function() {
             });
             $(canvas).on('mouseup', function() { 
                 target = false; 
+                freeze = false;
             });
         },
         getTarget: function(x, y) {
