@@ -7,7 +7,7 @@ var html5Crop = (function() {
         return function(value) {
             if (freeze_x && $.inArray(dot_name, ['lt_x', 'lb_x', 'rt_x', 'rb_x']) != -1) { return it[dot_name]; }
             if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
-            it[dot_name] = value ? value : it[dot_name];
+            it[dot_name] = value !== undefined' ? value : it[dot_name];
             return it[dot_name];
         }
     }
