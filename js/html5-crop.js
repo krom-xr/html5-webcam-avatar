@@ -1,8 +1,43 @@
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel;
+    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel, freeze_x, freeze_y;
+
+    var setDot = function(dot_name, value) {
+        var it = this;
+        it[dot_name] = value;
+        return function(value) {
+            if (freeze_x && $.inArray(dot_name, ['lt_x', 'lb_x', 'rt_x', 'rb_x']) != -1) { return it[dot_name]; }
+            if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
+            it[dot_name] = value ? value : it[dot_name];
+            return it[dot_name];
+        }
+    }
+
     var dots = {
-        lt: {x: 0,   y: 0  }, rt: {x: 100, y: 0  },
-        lb: {x: 0,   y: 100}, rb: {x: 100, y: 100}
+        lt: {x: setDot('lt_x', 0),   y: setDot('lt_y', 0)  }, rt: {x: setDot('rt_x', 100), y: setDot('rt_y', 0)  },
+        lb: {x: setDot('lb_x', 0),   y: setDot('lb_y', 100)}, rb: {x: setDot('rb_x', 100), y: setDot('rb_y', 100)},
+
+    };
+
+    var getXLimit = function(dot, limit_size) {
+        return dot == dots.lt || dot == dots.lb
+            ? dots.rt.x() - limit_size : dots.lt.x() + limit_size;
+    };
+
+    var getYLimit= function(dot, limit_size) {
+        return dot == dots.lt || dot == dots.rt
+            ? dots.lb.y() - limit_size : dots.lt.y() + limit_size;
+    };
+
+    var getSideX = function(dot, x) {
+        var x1 = x;
+        var x2 = (dots.lt == dot || dots.lb == dot) ? dots.rt.x() : dots.lt.x();
+        return Math.abs(x1-x2);
+    };
+
+    var getSideY = function(dot, y) {
+        var y1 = y;
+        var y2 = (dots.lt == dot || dots.rt == dot) ? dots.lb.y() : dots.lt.y();
+        return Math.abs(y1-y2);
     };
 
     return {
@@ -10,10 +45,10 @@ var html5Crop = (function() {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
-                square_mode: false,
+                //square_mode: true,
+                //max_side: 200,
+                min_side: 50,
                 dot_side: 10,
-                max_side: 300, // false
-                min_side: 100, // false
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
             }, options);
@@ -73,22 +108,22 @@ var html5Crop = (function() {
             f_ctx.strokeStyle = '#000';
 
             $.each(dots, function(i, dot) { 
-                f_ctx.fillRect(dot.x, dot.y, o.dot_side, o.dot_side); 
-                f_ctx.strokeRect(dot.x, dot.y, o.dot_side, o.dot_side); 
+                f_ctx.fillRect(dot.x(), dot.y(), o.dot_side, o.dot_side); 
+                f_ctx.strokeRect(dot.x(), dot.y(), o.dot_side, o.dot_side); 
             });
 
             var d_ctx = darken_canvas.getContext('2d');
             d_ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             d_ctx.clearRect(0, 0, f_canvas.width, f_canvas.height);
             d_ctx.fillRect(0, 0, f_canvas.width, f_canvas.height);
-            d_ctx.clearRect(dots.lt.x + o.dot_side/2, dots.lt.y + o.dot_side/2, dots.rt.x - dots.lt.x, dots.lb.y - dots.lt.y);
+            d_ctx.clearRect(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
         },
         moveArea: function(x, y, old_x, old_y) {
             var diff_x = old_x - x; 
             var diff_y = old_y - y;
             $.each(dots, function(i, dot) {
-                dot.x = dot.x - diff_x;
-                dot.y = dot.y - diff_y;
+                dot.x(dot.x() - diff_x);
+                dot.y(dot.y() - diff_y);
             });
 
             this.drawDots();
@@ -97,7 +132,7 @@ var html5Crop = (function() {
             x = x - o.dot_side/2;
             y = y - o.dot_side/2;
             var dot = detect(dots, function(_dot) { return _dot.active; });
-            $.each(dots, function(i, _dot) { if (_dot.active) { dot = _dot; return false; } });
+           
             //if (o.square_mode) {
                 //if (dot == dots.lt || dot == dots.rb) {
                     //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
@@ -106,26 +141,28 @@ var html5Crop = (function() {
                 //}
             //}
 
-            dot.x = x; dot.y = y;
-            if (dot == dots.lt) { dots.rt.y = y; dots.lb.x = x; }
-            if (dot == dots.rb) { dots.rt.x = x; dots.lb.y = y; }
-            if (dot == dots.rt) { dots.lt.y = y; dots.rb.x = x; }
-            if (dot == dots.lb) { dots.lt.x = x; dots.rb.y = y; }
+            dot.x(x); dot.y(y);
 
-            if (o.max_side || o.min_side) {
-                var side_one = Math.sqrt(Math.pow(dots.lt.x - dots.rt.x, 2) + Math.pow(dots.lt.y - dots.rt.y, 2));
-                if (side_one >= o.max_side) {
-                    return false;
-                }
-            }
+            o.max_side && getSideX(dot, x) >= o.max_side && dot.x(getXLimit(dot, o.max_side));
+            o.max_side && getSideY(dot, y) >= o.max_side && dot.y(getYLimit(dot, o.max_side));
+            o.min_side && getSideX(dot, x) <= o.min_side && dot.x(getXLimit(dot, o.min_side));
+            o.min_side && getSideY(dot, y) <= o.min_side && dot.y(getYLimit(dot, o.min_side));
+
+
+            if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
+            if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
+            if (dot == dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); } 
+            if (dot == dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); } 
+
+            //freeze_x = false;
+            //freeze_y = false;
 
             this.drawDots();
         },
         setActionHandlers: function(canvas) {
             var it = this,
                 target,
-                drag_position,
-                dot_position; 
+                drag_position;
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
@@ -149,8 +186,8 @@ var html5Crop = (function() {
             var it = this;
             var target = false; // false, 'dot', 'area'
 
-            if ((dots.lt.x < x && x < dots.rt.x + o.dot_side || dots.rt.x < x && x < dots.lt.x + o.dot_side)
-                && (dots.lt.y < y && y < dots.lb.y + o.dot_side || dots.lb.y < y && y < dots.lt.y + o.dot_side )) {
+            if ((dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side)
+                && (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side )) {
 
                 target = 'area';
             } else { 
@@ -158,7 +195,7 @@ var html5Crop = (function() {
             }
 
             $.each(dots, function(i, dot) { 
-                dot.active = Boolean((dot.x < x && x < (dot.x + o.dot_side)) && (dot.y < y && y < (dot.y + o.dot_side)));
+                dot.active = Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
                 target = !dot.active ? target : 'dot';
             });
 
@@ -166,10 +203,10 @@ var html5Crop = (function() {
         },
         setButtonActions: function() {
             $btn_crop.on('click', function() {
-                var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x + o.dot_side/2, dots.lt.y + o.dot_side/2, dots.rt.x - dots.lt.x, dots.lb.y - dots.lt.y);
+                var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
                 var canvas = document.createElement('canvas');
-                canvas.width = Math.abs(dots.rt.x - dots.lt.x);
-                canvas.height = Math.abs(dots.lb.y - dots.lt.y);
+                canvas.width = Math.abs(dots.rt.x() - dots.lt.x());
+                canvas.height = Math.abs(dots.lb.y() - dots.lt.y());
                 canvas.getContext('2d').putImageData(im_data, 0, 0);
 
                 var url = canvas.toDataURL();
