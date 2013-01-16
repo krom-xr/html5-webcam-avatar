@@ -46,7 +46,7 @@ var html5Crop = (function() {
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 //square_mode: true,
-                max_side: 200,
+                //max_side: 200,
                 min_side: 50,
                 dot_side: 10,
                 modal_class: 'modal',
@@ -142,13 +142,11 @@ var html5Crop = (function() {
             //}
 
             dot.x(x); dot.y(y);
-            if (o.max_side || o.min_side) {
-                getSideX(dot, x) >= o.max_side && dot.x(getXLimit(dot, o.max_side));
-                getSideY(dot, y) >= o.max_side && dot.y(getYLimit(dot, o.max_side));
 
-                getSideX(dot, x) <= o.min_side && dot.x(getXLimit(dot, o.min_side));
-                getSideY(dot, y) <= o.min_side && dot.y(getYLimit(dot, o.min_side));
-            }
+            o.max_side && getSideX(dot, x) >= o.max_side && dot.x(getXLimit(dot, o.max_side));
+            o.max_side && getSideY(dot, y) >= o.max_side && dot.y(getYLimit(dot, o.max_side));
+            o.min_side && getSideX(dot, x) <= o.min_side && dot.x(getXLimit(dot, o.min_side));
+            o.min_side && getSideY(dot, y) <= o.min_side && dot.y(getYLimit(dot, o.min_side));
 
 
             if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
