@@ -7,7 +7,7 @@ var html5Crop = (function() {
         return function(value) {
             if (freeze_x && $.inArray(dot_name, ['lt_x', 'lb_x', 'rt_x', 'rb_x']) != -1) { return it[dot_name]; }
             if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
-            it[dot_name] = value !== undefined' ? value : it[dot_name];
+            it[dot_name] = value !== undefined ? value : it[dot_name];
             return it[dot_name];
         }
     }
@@ -39,6 +39,14 @@ var html5Crop = (function() {
         var y2 = (dots.lt == dot || dots.rt == dot) ? dots.lb.y() : dots.lt.y();
         return Math.abs(y1-y2);
     };
+    var checkOutOfBorders = function() {
+        var dot = detect(dots, function(dot) {
+            return dot.x() <= 0 || dot.x() > base_canvas.width;
+        });
+        return dot;
+        if (!dot) { return false; }
+        return {dot: dot, compass: dot.x() <= 0 ? 'west' : 'east'}
+    }
 
     return {
         init: function(options) {
@@ -125,6 +133,20 @@ var html5Crop = (function() {
                 dot.x(dot.x() - diff_x);
                 dot.y(dot.y() - diff_y);
             });
+            var dotx = checkOutOfBorders();
+            if (dotx) {
+                if (dotx == dots.lt || dotx == dots.lb) { 
+                    var xside = getSideX(dotx, dotx.x());
+                    dots.lt.x(0); dots.lb.x(0);
+                    dots.rt.x(dots.lt.x() + xside);
+                    dots.rb.x(dots.lt.x() + xside);
+                } else {
+                    var xside = getSideX(dotx, dotx.x());
+                    dots.rt.x(base_canvas.width); dots.rb.x(base_canvas.width);
+                    dots.lt.x(dots.rt.x() - xside);
+                    dots.lb.x(dots.rt.x() - xside);
+                }
+            }
 
             this.drawDots();
         },
