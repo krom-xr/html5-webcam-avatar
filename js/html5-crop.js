@@ -19,6 +19,16 @@ var html5Crop = (function() {
 
     };
 
+    var getDotInThisPosition = function(x, y) {
+        return detect(dots, function(dot) {
+            return Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
+        });
+    };
+
+    var setActiveDot = function(dot) {
+        $.each(dots, function(i, _dot) { _dot.active = _dot == dot; });
+    }
+
     var getXLimit = function(dot, limit_size) {
         return dot == dots.lt || dot == dots.lb
             ? dots.rt.x() - limit_size : dots.lt.x() + limit_size;
@@ -233,6 +243,9 @@ var html5Crop = (function() {
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
+                if (target == 'dot') {
+                    setActiveDot(getDotInThisPosition(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY));
+                }
                 drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
 
             });
@@ -262,14 +275,9 @@ var html5Crop = (function() {
 
             //});
         },
-        getActiveDot: function(x, y) {
-            return detect(dots, function(dot) {
-                return Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
-            });
-        },
         getTarget: function(x, y) {
-            var it = this;
-            var target = false; // false, 'dot', 'area'
+            var it = this,
+                target = false; // false, 'dot', 'area'
 
             if ((dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side)
                 && (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side )) {
@@ -279,17 +287,7 @@ var html5Crop = (function() {
                 return false;
             }
 
-            var active_dot = it.getActiveDot(x, y);
-            
-            active_dot.active = true;
-            target = !active_dot ? target : 'dot';
-
-            //$.each(dots, function(i, dot) { 
-                //dot.active = Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
-                //target = !dot.active ? target : 'dot';
-            //});
-
-            return target;
+            return !getDotInThisPosition(x, y) ? target : 'dot';
         },
         setButtonActions: function() {
             $btn_crop.on('click', function() {
