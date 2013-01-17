@@ -25,9 +25,14 @@ var html5Crop = (function() {
         });
     };
 
+    var isPositionInArea = function(x, y) {
+        return (dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side)
+            && (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side );
+    };
+
     var setActiveDot = function(dot) {
         $.each(dots, function(i, _dot) { _dot.active = _dot == dot; });
-    }
+    };
 
     var getXLimit = function(dot, limit_size) {
         return dot == dots.lt || dot == dots.lb
@@ -250,9 +255,6 @@ var html5Crop = (function() {
 
             });
             $(canvas).on('mousemove', function(e) {
-
-                //it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
-
                 if (!target) { return false; }
                 if (target == 'dot') {
                     it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
@@ -275,19 +277,9 @@ var html5Crop = (function() {
 
             //});
         },
+        //returns 'false', 'area', 'dot'
         getTarget: function(x, y) {
-            var it = this,
-                target = false; // false, 'dot', 'area'
-
-            if ((dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side)
-                && (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side )) {
-
-                target = 'area';
-            } else { 
-                return false;
-            }
-
-            return !getDotInThisPosition(x, y) ? target : 'dot';
+            return getDotInThisPosition(x, y) ? 'dot' : isPositionInArea(x, y) ? "area" : false;
         },
         setButtonActions: function() {
             $btn_crop.on('click', function() {
