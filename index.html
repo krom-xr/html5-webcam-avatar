@@ -8,23 +8,16 @@
     <script>
         $(document).ready(function() {
             $('button').html5WebCam({
-                onsnapshot: function(snapshot_url) {
-                    html5Crop.init({
-                        url: snapshot_url,
-                        oncrop: function(cropped_url) {
-                            $("#cropped_img").attr('src', cropped_url);
-                        }
-                    });
-                }
+                onsnapshot: function(snapshot_url) {},
+                oncrop: function(cropped_url) { $("#cropped_img").attr('src', cropped_url); }
             });
 
-            html5Crop.init({
-                url: "example_image.jpg",
-                oncrop: function(cropped_url) {
-                    $("#cropped_img").attr('src', cropped_url);
-                }
-
-            });
+            //html5Crop.init({
+                //url: "example_image.jpg",
+                //oncrop: function(cropped_url) {
+                    //$("#cropped_img").attr('src', cropped_url);
+                //}
+            //});
         });
     </script> 
 </head>

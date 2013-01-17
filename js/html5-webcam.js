@@ -13,8 +13,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 TAKE_SNAPSHOT: 'Сделать снимок',
                 CANCEL: 'Отмена',
                 modal_class: 'modal',
-                onsnapshot: function(snapshot) {}
-
+                onsnapshot: function(snapshot) {},
+                use_crop: true,
+                oncrop: function(cropped_url) {}
             },options),
             modal =
                 "<div class='darken_bgr' style='display:none'>" +
@@ -52,10 +53,18 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-            o.onsnapshot(canvas.toDataURL());
-            //$this.trigger('webcam_snapshot', canvas.toDataURL());
+            var data_url = canvas.toDataURL();
             stream.stop();
             $modal.hide();
+
+            o.onsnapshot(data_url);
+            if (!o.use_crop) { return false; }
+            html5Crop.init({
+                url: data_url,
+                oncrop: function(cropped_url) {
+                    o.oncrop(cropped_url);
+                }
+            })
         });
 
         $this.on('click', function() {

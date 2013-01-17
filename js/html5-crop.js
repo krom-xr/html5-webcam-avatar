@@ -83,7 +83,7 @@ var html5Crop = (function() {
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 square_mode: true,
-                max_side: 200,
+                max_side: 400,
                 min_side: 50,
                 init_crop_side: 200,
                 dot_side: 10,
