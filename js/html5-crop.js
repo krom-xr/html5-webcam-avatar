@@ -72,8 +72,8 @@ var html5Crop = (function() {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
-                //square_mode: true,
-                //max_side: 200,
+                square_mode: true,
+                max_side: 200,
                 min_side: 50,
                 dot_side: 10,
                 modal_class: 'modal',
@@ -184,21 +184,22 @@ var html5Crop = (function() {
             y = y - o.dot_side/2;
             var dot = detect(dots, function(_dot) { return _dot.active; });
            
-            //if (o.square_mode) {
-                //if (dot == dots.lt || dot == dots.rb) {
-                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y - old_x + x; } else { x = y - old_y + old_x; }
-                //} else {
-                    //if (Math.abs(x - old_x) > Math.abs(y - old_y)) { y = old_y + old_x - x; } else { x = old_y + old_x - y; }
-                //}
-            //}
-
             dot.x(x); dot.y(y);
 
-            o.max_side && getSideX(dot, x) >= o.max_side && dot.x(getXLimit(dot, o.max_side));
-            o.max_side && getSideY(dot, y) >= o.max_side && dot.y(getYLimit(dot, o.max_side));
-            o.min_side && getSideX(dot, x) <= o.min_side && dot.x(getXLimit(dot, o.min_side));
-            o.min_side && getSideY(dot, y) <= o.min_side && dot.y(getYLimit(dot, o.min_side));
+            if (o.max_side) {
+                getSideX(dot, x) >= o.max_side && dot.x(getXLimit(dot, o.max_side));
+                getSideY(dot, y) >= o.max_side && dot.y(getYLimit(dot, o.max_side));
+            }
+            if (o.min_side) {
+                o.min_side && getSideX(dot, x) <= o.min_side && dot.x(getXLimit(dot, o.min_side));
+                o.min_side && getSideY(dot, y) <= o.min_side && dot.y(getYLimit(dot, o.min_side));
+            }
 
+            if (o.square_mode) {
+                var sidex = getSideX(dot, x);
+                var sidey = getSideY(dot, y);
+                sidex > sidey ? dot.x(getXLimit(dot, sidey)) : dot.y(getYLimit(dot, sidex));
+            }
 
             if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
             if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
