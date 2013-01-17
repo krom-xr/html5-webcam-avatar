@@ -186,20 +186,28 @@ var html5Crop = (function() {
            
             dot.x(x); dot.y(y);
 
+            var sidex = getSideX(dot, x);
+            var sidey = getSideY(dot, y);
+
+
             if (o.max_side) {
-                getSideX(dot, x) >= o.max_side && dot.x(getXLimit(dot, o.max_side));
-                getSideY(dot, y) >= o.max_side && dot.y(getYLimit(dot, o.max_side));
+                sidex >= o.max_side && dot.x(getXLimit(dot, o.max_side));
+                sidey >= o.max_side && dot.y(getYLimit(dot, o.max_side));
             }
             if (o.min_side) {
-                o.min_side && getSideX(dot, x) <= o.min_side && dot.x(getXLimit(dot, o.min_side));
-                o.min_side && getSideY(dot, y) <= o.min_side && dot.y(getYLimit(dot, o.min_side));
+                sidex <= o.min_side && dot.x(getXLimit(dot, o.min_side));
+                sidey <= o.min_side && dot.y(getYLimit(dot, o.min_side));
             }
 
+            sidex = getSideX(dot, dot.x());
+            sidey = getSideY(dot, dot.y());
+
             if (o.square_mode) {
-                var sidex = getSideX(dot, x);
-                var sidey = getSideY(dot, y);
-                sidex > sidey ? dot.x(getXLimit(dot, sidey)) : dot.y(getYLimit(dot, sidex));
+                if (sidex !== sidey) {
+                    sidex < sidey ? dot.x(getXLimit(dot, sidey)) : dot.y(getYLimit(dot, sidex));
+                }
             }
+
 
             if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
             if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
