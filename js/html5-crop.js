@@ -182,13 +182,11 @@ var html5Crop = (function() {
         moveDot: function(x, y, old_x, old_y) {
             x = x - o.dot_side/2;
             y = y - o.dot_side/2;
-            var dot = detect(dots, function(_dot) { return _dot.active; });
+            var dot = detect(dots, function(_dot) { return _dot.active; }),
+                sidex = getSideX(dot, x),
+                sidey = getSideY(dot, y);
            
             dot.x(x); dot.y(y);
-
-            var sidex = getSideX(dot, x);
-            var sidey = getSideY(dot, y);
-
 
             if (o.max_side) {
                 sidex >= o.max_side && dot.x(getXLimit(dot, o.max_side));
@@ -199,23 +197,18 @@ var html5Crop = (function() {
                 sidey <= o.min_side && dot.y(getYLimit(dot, o.min_side));
             }
 
-            sidex = getSideX(dot, dot.x());
-            sidey = getSideY(dot, dot.y());
-
             if (o.square_mode) {
+                sidex = getSideX(dot, dot.x());
+                sidey = getSideY(dot, dot.y());
                 if (sidex !== sidey) {
                     sidex < sidey ? dot.x(getXLimit(dot, sidey)) : dot.y(getYLimit(dot, sidex));
                 }
             }
 
-
             if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
             if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
             if (dot == dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); } 
             if (dot == dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); } 
-
-            //freeze_x = false;
-            //freeze_y = false;
 
             this.drawDots();
         },
