@@ -1,5 +1,6 @@
+var base_canvas,darken_canvas, f_canvas;
 var html5Crop = (function() {
-    var o, modal, $modal, base_canvas, darken_canvas, f_canvas, $btn_crop, $btn_cancel, freeze_x, freeze_y;
+    var o, modal, $modal,   $btn_crop, $btn_cancel, freeze_x, freeze_y;
 
     var setDot = function(dot_name, value) {
         var it = this;
@@ -236,6 +237,9 @@ var html5Crop = (function() {
 
             });
             $(canvas).on('mousemove', function(e) {
+
+                //it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
+
                 if (!target) { return false; }
                 if (target == 'dot') {
                     it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
@@ -246,6 +250,21 @@ var html5Crop = (function() {
             });
             $(canvas).on('mouseup', function() { 
                 target = false; 
+            });
+
+            //$(canvas).on('mousemove', function(e) {
+                //var target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
+                //if (target == 'dot') {
+                    //$(canvas).css('cursor', 'ne-resize');
+                //} else {
+                    //$(canvas).css('cursor', 'default');
+                //}
+
+            //});
+        },
+        getActiveDot: function(x, y) {
+            return detect(dots, function(dot) {
+                return Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
             });
         },
         getTarget: function(x, y) {
@@ -260,10 +279,15 @@ var html5Crop = (function() {
                 return false;
             }
 
-            $.each(dots, function(i, dot) { 
-                dot.active = Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
-                target = !dot.active ? target : 'dot';
-            });
+            var active_dot = it.getActiveDot(x, y);
+            
+            active_dot.active = true;
+            target = !active_dot ? target : 'dot';
+
+            //$.each(dots, function(i, dot) { 
+                //dot.active = Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
+                //target = !dot.active ? target : 'dot';
+            //});
 
             return target;
         },

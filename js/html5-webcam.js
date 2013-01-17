@@ -58,13 +58,14 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             $modal.hide();
 
             o.onsnapshot(data_url);
-            if (!o.use_crop) { return false; }
-            html5Crop.init({
-                url: data_url,
-                oncrop: function(cropped_url) {
-                    o.oncrop(cropped_url);
-                }
-            })
+            if (o.use_crop) { 
+                html5Crop.init({
+                    url: data_url,
+                    oncrop: function(cropped_url) {
+                        o.oncrop(cropped_url);
+                    }
+                })
+            }
         });
 
         $this.on('click', function() {
