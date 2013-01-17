@@ -5,16 +5,16 @@ var html5Crop = (function() {
         var it = this;
         it[dot_name] = value;
         return function(value) {
-            if (freeze_x && $.inArray(dot_name, ['lt_x', 'lb_x', 'rt_x', 'rb_x']) != -1) { return it[dot_name]; }
-            if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
+            //if (freeze_x && $.inArray(dot_name, ['lt_x', 'lb_x', 'rt_x', 'rb_x']) != -1) { return it[dot_name]; }
+            //if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
             it[dot_name] = value !== undefined ? value : it[dot_name];
             return it[dot_name];
         }
     }
 
     var dots = {
-        lt: {x: setDot('lt_x', 0),   y: setDot('lt_y', 0)  }, rt: {x: setDot('rt_x', 100), y: setDot('rt_y', 0)  },
-        lb: {x: setDot('lb_x', 0),   y: setDot('lb_y', 100)}, rb: {x: setDot('rb_x', 100), y: setDot('rb_y', 100)},
+        lt: {x: setDot('lt_x'),   y: setDot('lt_y')}, rt: {x: setDot('rt_x'), y: setDot('rt_y')},
+        lb: {x: setDot('lb_x'),   y: setDot('lb_y')}, rb: {x: setDot('rb_x'), y: setDot('rb_y')},
 
     };
 
@@ -39,6 +39,7 @@ var html5Crop = (function() {
         var y2 = (dots.lt == dot || dots.rt == dot) ? dots.lb.y() : dots.lt.y();
         return Math.abs(y1-y2);
     };
+
     var checkXOutOfBorders = function() {
         var min_limit = - o.dot_side/2,
             max_limit = base_canvas.width - o.dot_side/2,
@@ -51,7 +52,7 @@ var html5Crop = (function() {
             limit = compass == 'west' ? min_limit: max_limit;
 
         return {dot: dot, compass: compass , limit: limit}
-    }
+    };
 
     var checkYOutOfBorders = function() {
         var min_limit = - o.dot_side/2,
@@ -65,7 +66,16 @@ var html5Crop = (function() {
             limit = compass == 'north' ? min_limit: max_limit;
 
         return {dot: dot, compass: compass , limit: limit}
-    }
+    };
+
+    var setInitDotsValues = function(side, w, h) {
+        var x = w/2 - side/2, y = h/2 - side/2;
+        dots.lt.x(x); dots.lt.y(y); 
+        dots.lb.x(x); dots.lb.y(y + side); 
+        dots.rt.x(x + side); dots.rt.y(y); 
+        dots.rb.x(x + side); dots.rb.y(y + side); 
+
+    };
 
     return {
         init: function(options) {
@@ -75,6 +85,7 @@ var html5Crop = (function() {
                 square_mode: true,
                 max_side: 200,
                 min_side: 50,
+                init_crop_side: 200,
                 dot_side: 10,
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
@@ -123,8 +134,10 @@ var html5Crop = (function() {
 
                 $modal.show();
                 toCenter($modal.find("." + o.modal_class));
-                it.drawDots();
+                setInitDotsValues(o.init_crop_side, this.width, this.height);
                 it.setActionHandlers(f_canvas);
+                it.drawDots();
+
             });
         },
         drawDots: function() {
