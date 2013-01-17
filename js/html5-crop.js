@@ -152,11 +152,11 @@ var html5Crop = (function() {
                 toCenter($modal.find("." + o.modal_class));
                 setInitDotsValues(o.init_crop_side, this.width, this.height);
                 it.setActionHandlers(f_canvas);
-                it.drawDots();
+                it.draw();
 
             });
         },
-        drawDots: function() {
+        draw: function() {
             var f_ctx = f_canvas.getContext('2d');
             f_ctx.clearRect(0, 0, f_canvas.width, f_canvas.height);
 
@@ -206,7 +206,7 @@ var html5Crop = (function() {
                 }
             }
 
-            this.drawDots();
+            this.draw();
         },
         moveDot: function(x, y, old_x, old_y) {
             x = x - o.dot_side/2;
@@ -239,12 +239,13 @@ var html5Crop = (function() {
             if (dot == dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); } 
             if (dot == dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); } 
 
-            this.drawDots();
+            this.draw();
         },
         setActionHandlers: function(canvas) {
             var it = this,
                 target,
-                drag_position;
+                drag_position,
+                drag = false;
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
@@ -252,34 +253,43 @@ var html5Crop = (function() {
                     setActiveDot(getDotInThisPosition(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY));
                 }
                 drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
+                drag = true;
 
             });
             $(canvas).on('mousemove', function(e) {
-                if (!target) { return false; }
-                if (target == 'dot') {
-                    it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
-                } else if (target == 'area') {
-                    it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
-                    drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
+                if (drag) { 
+                    if (target == 'dot') {
+                        it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
+                    } else if (target == 'area') {
+                        it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
+                        drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
+                    }
+                } else {
+                    it.setCursor(canvas, 
+                        it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY),
+                        getDotInThisPosition(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY));
                 }
             });
             $(canvas).on('mouseup', function() { 
                 target = false; 
+                drag = false;
             });
-
-            //$(canvas).on('mousemove', function(e) {
-                //var target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
-                //if (target == 'dot') {
-                    //$(canvas).css('cursor', 'ne-resize');
-                //} else {
-                    //$(canvas).css('cursor', 'default');
-                //}
-
-            //});
         },
-        //returns 'false', 'area', 'dot'
+        /* returns 'false', 'area', 'dot' */
         getTarget: function(x, y) {
             return getDotInThisPosition(x, y) ? 'dot' : isPositionInArea(x, y) ? "area" : false;
+        },
+        setCursor: function(canvas, target, dot) {
+            if (target == 'dot') {
+                if (dot == dots.lt) { $(canvas).css('cursor', 'nw-resize'); }
+                if (dot == dots.rt) { $(canvas).css('cursor', 'ne-resize'); }
+                if (dot == dots.rb) { $(canvas).css('cursor', 'se-resize'); }
+                if (dot == dots.lb) { $(canvas).css('cursor', 'sw-resize'); }
+            } else if (target == 'area') {
+                $(canvas).css('cursor', 'pointer');
+            } else {
+                $(canvas).css('cursor', 'default');
+            }
         },
         setButtonActions: function() {
             $btn_crop.on('click', function() {
