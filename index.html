@@ -33,10 +33,11 @@
 
             $('button').html5WebCam({
                 oncrop: function(cropped_url) { $("#cropped_img").attr('src', cropped_url); },
-                ondomcreated: function($html) {
-                    $dialog_el.html('');
-                    $dialog_el.append($html).dialog("open").dialog("option", "position", "center");
-                }
+                //use_native_modal: false,
+                //onDomCreated: function($html) {
+                    //$dialog_el.html('');
+                    //$dialog_el.append($html).dialog("open").dialog("option", "position", "center");
+                //}
             });
 
             //html5Crop.init({
