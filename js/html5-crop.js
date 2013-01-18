@@ -324,6 +324,9 @@ var html5Crop = (function() {
                 o.oncrop && o.oncrop(url);
                 $modal.hide();
             });
+            $btn_cancel.on('click', function() {
+                $modal.hide();
+            });
         }
     }
 })();

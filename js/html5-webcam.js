@@ -12,7 +12,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
                 TAKE_SNAPSHOT: 'Сделать снимок',
                 CANCEL: 'Отмена',
-                //max_video_size: 200,
+                max_video_size: 600,
                 modal_class: 'modal',
                 onsnapshot: function(snapshot) {},
                 use_crop: true,
