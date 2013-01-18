@@ -98,6 +98,7 @@ var html5Crop = (function() {
             o = $.extend({
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
+                MIN_IMG_SIDE_ERROR: 'Слишком маленькое изображение по ширине или выстоте',
                 square_mode: true,
                 max_crop_side: 400,
                 min_crop_side: 50,
@@ -155,6 +156,10 @@ var html5Crop = (function() {
                     width = this.width;
                     height = this.height;
                 }
+                if (width < o.min_img_side || height < o.min_img_side) {
+                    alert(o.MIN_IMG_SIDE_ERROR);
+                    return false;
+                };
 
                 base_canvas.width = width;
                 base_canvas.height = height;
