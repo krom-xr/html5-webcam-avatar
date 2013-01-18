@@ -14,32 +14,43 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 CANCEL: 'Отмена',
                 max_video_size: 600,
                 modal_class: 'modal',
+                use_native_modal: true,
+                ondomcreated: function(html) { console.log(html);},
                 onsnapshot: function(snapshot) {},
                 use_crop: true,
                 oncrop: function(cropped_url) {}
             },options),
             ui = 
                 supplant(
-                    "<div><video autoplay title='{pause}'></div>" +
-                    "<input type='button' name='snapshot' value='{snapshot}'/>" +
-                    "<input type='button' name='cancel' value='{cancel}'/>", {
+                    "<div>" +
+                        "<div><video autoplay title='{pause}'></div>" +
+                        "<input type='button' name='snapshot' value='{snapshot}'/>" +
+                        "<input type='button' name='cancel' value='{cancel}'/>" +
+                    "</div>", {
                         pause: o.CLICK_TO_PAUSE, 
                         snapshot: o.TAKE_SNAPSHOT, 
                         cancel: o.CANCEL
                     });
-            modal =
-                supplant(
-                    "<div class='darken_bgr' style='display:none'>" +
-                        "<div class='{modal_class}' style='position:fixed;'>{ui}</div>" +
-                    "</div>", {modal_class: o.modal_class, ui: ui}),
+            $ui = $(ui);
 
-            $modal = $(modal),
-            $video = $modal.find('video'),
+        //if (use_native_modal) {
+            //var modal =
+                    //supplant(
+                        //"<div class='darken_bgr' style='display:none'>" +
+                            //"<div class='{modal_class}' style='position:fixed;'>{ui}</div>" +
+                        //"</div>", {modal_class: o.modal_class, ui: ui});
+
+                //$modal = $(modal),
+            //var $modal = $ui,
+        //}
+
+        var $video = $ui.find('video'),
             video = $video[0],
-            $btn_snapshot = $modal.find('input[name=snapshot]'),
-            $btn_cancel = $modal.find('input[name=cancel]');
+            $btn_snapshot = $ui.find('input[name=snapshot]'),
+            $btn_cancel = $ui.find('input[name=cancel]');
 
-        $('body').append($modal);
+        //$('body').append($modal);
+        //o.ondomcreated($ui);
 
         $video.on('click', function() { video.paused ? video.play() : video.pause(); });
 
@@ -49,7 +60,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     $video.width(o.max_video_size) :
                     $video.height(o.max_video_size);
             }
-            toCenter($modal.find('.' + o.modal_class));
+            //toCenter($modal.find('.' + o.modal_class));
         });
 
         $btn_cancel.on('click', function() {
@@ -85,7 +96,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             navigator.getUserMedia && navigator.getUserMedia({video: true, audio: true}, function(_stream) {
                 stream = _stream;
                 video.src = window.URL.createObjectURL(stream);
-                $modal.show();
+                //$modal.show();
+
+                o.ondomcreated($ui);
             }, function() { alert(o.CAMERA_NOT_FOUND); });
         });
 
