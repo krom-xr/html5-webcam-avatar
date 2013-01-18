@@ -27,6 +27,7 @@
                 buttons: {
                     'сделать snapshot': function() {
                         $shot_btn.html5WebCam('snapshot');
+                        $(this).dialog('close');
                     },
                 }
             });

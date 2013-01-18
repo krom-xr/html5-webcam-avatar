@@ -4,7 +4,15 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
 (function($) {
     $.fn.html5WebCam = function(options) {
-        var $this = $(this), stream, $modal_blocker, $modal, $btn_snapshot, $btn_cancel,
+        var $this = $(this);
+        if ($this.data("html5WebCam")) { 
+            if (!typeof options === 'string') { return false; }
+            return $this.data(options)();
+        }
+
+        $this.data("html5WebCam", true);
+
+        var stream, $modal_blocker, $modal, $btn_snapshot, $btn_cancel,
             o = $.extend({
                 NOT_SUPPORT_FEATURE: 'Этот браузер не поддерживает захват с камеры',
                 CAMERA_NOT_FOUND: 'Камера не найдена на этом устройстве',
@@ -33,6 +41,34 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     });
             $ui = $(ui);
 
+        $this.data('snapshot', function() {
+            var canvas = document.createElement('canvas');
+            var width = $video.width();
+            var height = $video.height();
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+            var data_url = canvas.toDataURL();
+            stream.stop();
+            o.use_native_modal && $modal_blocker.hide();
+
+            o.onsnapshot(data_url);
+            if (o.use_crop) { 
+                //TODO receive options to html5Crop
+                html5Crop.init({
+                    url: data_url,
+                    oncrop: function(cropped_url) {
+                        o.oncrop(cropped_url);
+                    }
+                })
+            }
+        });
+
+        $this.data('close', function() {
+            stream.stop();
+            o.use_native_modal && $modal_blocker.hide();
+        });
+
         if (o.use_native_button) {
             $btn_snapshot =
                 $(supplant("<input type='button' name='snapshot' value='{snapshot}'/>", {snapshot: o.TAKE_SNAPSHOT}));
@@ -41,33 +77,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             $ui.append($btn_snapshot).append($btn_cancel);
 
-            $btn_cancel.on('click', function() {
-                stream.stop();
-                $modal_blocker.hide();
-            });
-
-            $btn_snapshot.on('click', function() {
-                var canvas = document.createElement('canvas');
-                var width = $video.width();
-                var height = $video.height();
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext('2d').drawImage(video, 0, 0, width, height);
-                var data_url = canvas.toDataURL();
-                stream.stop();
-                $modal_blocker.hide();
-
-                o.onsnapshot(data_url);
-                if (o.use_crop) { 
-                    //TODO receive options to html5Crop
-                    html5Crop.init({
-                        url: data_url,
-                        oncrop: function(cropped_url) {
-                            o.oncrop(cropped_url);
-                        }
-                    })
-                }
-            });
+            $btn_snapshot.on('click', function() { $this.data('snapshot')(); });
+            $btn_cancel  .on('click', function() { $this.data('close')(); });
         }
 
         if (o.use_native_modal) {
