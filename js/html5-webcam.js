@@ -4,16 +4,17 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
 (function($) {
     $.fn.html5WebCam = function(options) {
-        var $this = $(this), stream, $modal_blocker, $modal,
+        var $this = $(this), stream, $modal_blocker, $modal, $btn_snapshot, $btn_cancel,
             o = $.extend({
                 NOT_SUPPORT_FEATURE: 'Этот браузер не поддерживает захват с камеры',
                 CAMERA_NOT_FOUND: 'Камера не найдена на этом устройстве',
                 CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
                 TAKE_SNAPSHOT: 'Сделать снимок',
                 CANCEL: 'Отмена',
-                max_video_size: 600,
+                max_video_size: 200,
                 modal_class: 'modal',
                 use_native_modal: true,
+                use_native_button: true,
                 onDomCreated: function($html) { },
                 onsnapshot: function(snapshot) {},
                 use_crop: true,
@@ -23,14 +24,51 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 supplant(
                     "<div>" +
                         "<div><video autoplay title='{pause}'></div>" +
-                        "<input type='button' name='snapshot' value='{snapshot}'/>" +
-                        "<input type='button' name='cancel' value='{cancel}'/>" +
+                        //"<input type='button' name='snapshot' value='{snapshot}'/>" +
+                        //"<input type='button' name='cancel' value='{cancel}'/>" +
                     "</div>", {
                         pause: o.CLICK_TO_PAUSE, 
                         snapshot: o.TAKE_SNAPSHOT, 
                         cancel: o.CANCEL
                     });
             $ui = $(ui);
+
+        if (o.use_native_button) {
+            $btn_snapshot =
+                $(supplant("<input type='button' name='snapshot' value='{snapshot}'/>", {snapshot: o.TAKE_SNAPSHOT}));
+            $btn_cancel = 
+                $(supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
+
+            $ui.append($btn_snapshot).append($btn_cancel);
+
+            $btn_cancel.on('click', function() {
+                stream.stop();
+                $modal_blocker.hide();
+            });
+
+            $btn_snapshot.on('click', function() {
+                var canvas = document.createElement('canvas');
+                var width = $video.width();
+                var height = $video.height();
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+                var data_url = canvas.toDataURL();
+                stream.stop();
+                $modal_blocker.hide();
+
+                o.onsnapshot(data_url);
+                if (o.use_crop) { 
+                    //TODO receive options to html5Crop
+                    html5Crop.init({
+                        url: data_url,
+                        oncrop: function(cropped_url) {
+                            o.oncrop(cropped_url);
+                        }
+                    })
+                }
+            });
+        }
 
         if (o.use_native_modal) {
             $modal_blocker = $(supplant(
@@ -42,9 +80,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         }
 
         var $video = $ui.find('video'),
-            video = $video[0],
-            $btn_snapshot = $ui.find('input[name=snapshot]'),
-            $btn_cancel = $ui.find('input[name=cancel]');
+            video = $video[0];
 
         var showNativeModal = function() {
             $modal_blocker.show();
@@ -70,33 +106,6 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             setUiToModal();
         });
 
-        $btn_cancel.on('click', function() {
-            stream.stop();
-            $modal_blocker.hide();
-        });
-
-        $btn_snapshot.on('click', function() {
-            var canvas = document.createElement('canvas');
-            var width = $video.width();
-            var height = $video.height();
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext('2d').drawImage(video, 0, 0, width, height);
-            var data_url = canvas.toDataURL();
-            stream.stop();
-            $modal_blocker.hide();
-
-            o.onsnapshot(data_url);
-            if (o.use_crop) { 
-                //TODO receive options to html5Crop
-                html5Crop.init({
-                    url: data_url,
-                    oncrop: function(cropped_url) {
-                        o.oncrop(cropped_url);
-                    }
-                })
-            }
-        });
 
         $this.on('click', function() {
             if (!navigator.getUserMedia) { alert(o.NOT_SUPPORT_FEATURE); return false; }

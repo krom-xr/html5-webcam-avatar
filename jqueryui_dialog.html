@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<head>
+    <link rel="stylesheet" href="css/html5-webcam.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" type="text/css" media="screen" charset="utf-8">
+
+    <script src="js/jquery.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+
+
+
+    <script src="js/common.js"></script>
+    <script src="js/html5-crop.js"></script>
+    <script src="js/html5-webcam.js"></script>
+    <script>
+        var $dialog_el;
+        $(document).ready(function() {
+            $dialog_el = $("<div  title='Сделать snapshot с камеры'></div>")
+            var $shot_btn = $("#snapshot");
+            $dialog_el.dialog({
+                autoOpen: false,
+                width: 'auto',
+                center: true,
+                modal: true,
+                close: function() { 
+                    $shot_btn.html5WebCam('close');
+                },
+                buttons: {
+                    'сделать snapshot': function() {
+                        $shot_btn.html5WebCam('snapshot');
+                    },
+                }
+            });
+
+            $shot_btn.html5WebCam({
+                oncrop: function(cropped_url) { $("#cropped_img").attr('src', cropped_url); },
+                use_native_modal: false,
+                use_native_button: false,
+                onDomCreated: function($html) {
+                    $dialog_el.html('');
+                    $dialog_el.append($html).dialog("open").dialog("option", "position", "center");
+                }
+            });
+
+            //html5Crop.init({
+                //url: "example_big_image.jpg",
+                //oncrop: function(cropped_url) {
+                    //$("#cropped_img").attr('src', cropped_url);
+                //}
+            //});
+        });
+    </script> 
+</head>
+
+<body>
+    <button id="snapshot">Create Avatar</button> 
+    <!--<img src="http://i1231.photobucket.com/albums/ee520/blacksantana/abstract_3d-and-cg_300x225_207433_-_red_mushrooms.jpg" />-->
+    <img src="" id='cropped_img' alt="" />
+
+</body>
