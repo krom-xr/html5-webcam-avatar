@@ -4,7 +4,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
 (function($) {
     $.fn.html5WebCam = function(options) {
-        var $this = $(this), stream, modal, $modal,
+        var $this = $(this), stream, $modal_blocker, $modal,
             o = $.extend({
                 NOT_SUPPORT_FEATURE: 'Этот браузер не поддерживает захват с камеры',
                 CAMERA_NOT_FOUND: 'Камера не найдена на этом устройстве',
@@ -33,13 +33,12 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             $ui = $(ui);
 
         if (o.use_native_modal) {
-            modal =
-                    supplant(
-                        "<div class='darken_bgr' style='display:none'>" +
-                            "<div class='{modal_class}' style='position:fixed;'></div>" +
-                        "</div>", {modal_class: o.modal_class});
-            $modal = $(modal);
-            $('body').append($modal);
+            $modal_blocker = $(supplant(
+                            "<div class='darken_bgr' style='display:none'>" +
+                                "<div class='{modal_class}' style='position:fixed;'></div>" +
+                            "</div>", {modal_class: o.modal_class}));
+            $modal = $modal_blocker.find("." + o.modal_class);
+            $('body').append($modal_blocker);
         }
 
         var $video = $ui.find('video'),
@@ -47,16 +46,14 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             $btn_snapshot = $ui.find('input[name=snapshot]'),
             $btn_cancel = $ui.find('input[name=cancel]');
 
-        //$('body').append($modal);
-        //o.onDomCreated($ui);
-        
         var showNativeModal = function() {
-            $modal.show();
-            toCenter($modal.find("." + o.modal_class));
+            $modal_blocker.show();
+            toCenter($modal);
         }
+
         var setUiToModal = function() {
             if (o.use_native_modal) {
-                $modal.find("." + o.modal_class).append($ui);
+                $modal.append($ui);
                 showNativeModal();
             }
             o.onDomCreated($ui);
@@ -75,7 +72,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
         $btn_cancel.on('click', function() {
             stream.stop();
-            $modal.hide();
+            $modal_blocker.hide();
         });
 
         $btn_snapshot.on('click', function() {
@@ -87,7 +84,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             canvas.getContext('2d').drawImage(video, 0, 0, width, height);
             var data_url = canvas.toDataURL();
             stream.stop();
-            $modal.hide();
+            $modal_blocker.hide();
 
             o.onsnapshot(data_url);
             if (o.use_crop) { 
@@ -107,8 +104,6 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             navigator.getUserMedia && navigator.getUserMedia({video: true, audio: true}, function(_stream) {
                 stream = _stream;
                 video.src = window.URL.createObjectURL(stream);
-                //$modal.show();
-
             }, function() { alert(o.CAMERA_NOT_FOUND); });
         });
 
