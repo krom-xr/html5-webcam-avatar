@@ -142,17 +142,31 @@ var html5Crop = (function() {
             var it = this;
             var $img = $(supplant("<img src='{url}' >", {url: o.url}));
             $img.on('load', function() { 
-                base_canvas.width = this.width;
-                base_canvas.height = this.height;
-                base_canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height);
-                darken_canvas.width  = this.width;
-                darken_canvas.height = this.height;
-                f_canvas.width = this.width;
-                f_canvas.height = this.height;
+                var width  = this.width; 
+                var height = this.height;
+                if (width > o.max_img_side || height > o.max_img_side) {
+                    if (width > height) {
+                        this.width = o.max_img_side;
+                        this.height = height * this.width/width;
+                    } else {
+                        this.height = o.max_img_side;
+                        this.width = width * this.height/height;
+                    }
+                    width = this.width;
+                    height = this.height;
+                }
+
+                base_canvas.width = width;
+                base_canvas.height = height;
+                base_canvas.getContext('2d').drawImage(this, 0, 0, width, height);
+                darken_canvas.width  = width;
+                darken_canvas.height = height;
+                f_canvas.width = width;
+                f_canvas.height = height;
 
                 $modal.show();
                 toCenter($modal.find("." + o.modal_class));
-                setInitDotsValues(o.init_crop_side, this.width, this.height);
+                setInitDotsValues(o.init_crop_side, width, height);
                 it.setActionHandlers(f_canvas);
                 it.draw();
 
