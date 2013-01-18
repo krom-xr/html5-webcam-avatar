@@ -18,20 +18,22 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 use_crop: true,
                 oncrop: function(cropped_url) {}
             },options),
+            ui = 
+                supplant(
+                    "<div><video autoplay title='{pause}'></div>" +
+                    "<input type='button' name='snapshot' value='{snapshot}'/>" +
+                    "<input type='button' name='cancel' value='{cancel}'/>", {
+                        pause: o.CLICK_TO_PAUSE, 
+                        snapshot: o.TAKE_SNAPSHOT, 
+                        cancel: o.CANCEL
+                    });
             modal =
-                "<div class='darken_bgr' style='display:none'>" +
-                    "<div class='{modal_class}' style='position:fixed;'>" +
-                        "<div><video autoplay title='{pause}'></div>" +
-                        "<input type='button' name='snapshot' value='{snapshot}'/>" +
-                        "<input type='button' name='cancel' value='{cancel}'/>" +
-                    "</div>" +
-                "</div>", 
-            $modal = $(supplant(modal, {
-                pause: o.CLICK_TO_PAUSE, 
-                snapshot: o.TAKE_SNAPSHOT, 
-                cancel: o.CANCEL,
-                modal_class: o.modal_class
-            })),
+                supplant(
+                    "<div class='darken_bgr' style='display:none'>" +
+                        "<div class='{modal_class}' style='position:fixed;'>{ui}</div>" +
+                    "</div>", {modal_class: o.modal_class, ui: ui}),
+
+            $modal = $(modal),
             $video = $modal.find('video'),
             video = $video[0],
             $btn_snapshot = $modal.find('input[name=snapshot]'),
