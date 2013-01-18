@@ -99,9 +99,11 @@ var html5Crop = (function() {
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 square_mode: true,
-                max_side: 400,
-                min_side: 50,
-                init_crop_side: 200,
+                max_crop_side: 400,
+                min_crop_side: 50,
+                max_img_side: 800, // TODO
+                min_img_side: 100, // TODO
+                init_crop_side: 100,
                 dot_side: 10,
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
@@ -217,13 +219,13 @@ var html5Crop = (function() {
            
             dot.x(x); dot.y(y);
 
-            if (o.max_side) {
-                sidex >= o.max_side && dot.x(getXLimit(dot, o.max_side));
-                sidey >= o.max_side && dot.y(getYLimit(dot, o.max_side));
+            if (o.max_crop_side) {
+                sidex >= o.max_crop_side && dot.x(getXLimit(dot, o.max_crop_side));
+                sidey >= o.max_crop_side && dot.y(getYLimit(dot, o.max_crop_side));
             }
-            if (o.min_side) {
-                sidex <= o.min_side && dot.x(getXLimit(dot, o.min_side));
-                sidey <= o.min_side && dot.y(getYLimit(dot, o.min_side));
+            if (o.min_crop_side) {
+                sidex <= o.min_crop_side && dot.x(getXLimit(dot, o.min_crop_side));
+                sidey <= o.min_crop_side && dot.y(getYLimit(dot, o.min_crop_side));
             }
 
             if (o.square_mode) {
@@ -304,6 +306,5 @@ var html5Crop = (function() {
                 $modal.hide();
             });
         }
-
     }
 })();
