@@ -12,10 +12,14 @@
     <script src="js/html5-crop.js"></script>
     <script src="js/html5-webcam.js"></script>
     <script>
+        var $dialog_el;
         $(document).ready(function() {
-            var $dialog_el = $("<div  title='Сделать snapshot с камеры'></div>")
+            $dialog_el = $("<div  title='Сделать snapshot с камеры'></div>")
             var $shot_btn = $("#snapshot");
             $dialog_el.dialog({
+                autoOpen: false,
+                width: 'auto',
+                center: true,
                 modal: true,
                 close: function() { 
                     $shot_btn.html5WebCam('close');
@@ -25,13 +29,13 @@
                         $shot_btn.html5WebCam('snapshot');
                     },
                 }
-            }).dialog('close');
+            });
 
             $('button').html5WebCam({
                 oncrop: function(cropped_url) { $("#cropped_img").attr('src', cropped_url); },
                 ondomcreated: function($html) {
                     $dialog_el.html('');
-                    $dialog_el.append($html).dialog("open");
+                    $dialog_el.append($html).dialog("open").dialog("option", "position", "center");
                 }
             });
 

@@ -60,6 +60,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     $video.width(o.max_video_size) :
                     $video.height(o.max_video_size);
             }
+
+            o.ondomcreated($ui);
             //toCenter($modal.find('.' + o.modal_class));
         });
 
@@ -98,7 +100,6 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 video.src = window.URL.createObjectURL(stream);
                 //$modal.show();
 
-                o.ondomcreated($ui);
             }, function() { alert(o.CAMERA_NOT_FOUND); });
         });
 
