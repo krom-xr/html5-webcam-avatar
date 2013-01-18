@@ -12,6 +12,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
                 TAKE_SNAPSHOT: 'Сделать снимок',
                 CANCEL: 'Отмена',
+                //max_video_size: 200,
                 modal_class: 'modal',
                 onsnapshot: function(snapshot) {},
                 use_crop: true,
@@ -39,7 +40,13 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         $('body').append($modal);
 
         $video.on('click', function() { video.paused ? video.play() : video.pause(); });
-        $video.one('play', function() { 
+
+        $video.one('play', function() { //NB this is hack. I dont now how to detect when video is loaded 
+            if (o.max_video_size && (video.videoWidth > o.max_video_size || video.videoHeight > o.max_video_size)) {
+                video.videoWidth > video.videoHeight ?
+                    $video.width(o.max_video_size) :
+                    $video.height(o.max_video_size);
+            }
             toCenter($modal.find('.' + o.modal_class));
         });
 
@@ -50,9 +57,11 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
         $btn_snapshot.on('click', function() {
             var canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            var width = $video.width();
+            var height = $video.height();
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(video, 0, 0, width, height);
             var data_url = canvas.toDataURL();
             stream.stop();
             $modal.hide();
