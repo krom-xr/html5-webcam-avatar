@@ -26,7 +26,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 onDomCreated: function($html) { },
                 onsnapshot: function(snapshot) {},
                 use_crop: true,
-                oncrop: function(cropped_url) {}
+                oncrop: function(cropped_url) {},
+                oncancel: function() {}
+                
             },options),
             ui = 
                 supplant(
@@ -58,9 +60,10 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             }
         });
 
-        $this.data('close', function() {
+        $this.data('cancel', function() {
             stream.stop();
             o.use_native_modal && $modal_blocker.hide();
+            o.oncancel();
         });
 
         if (o.use_native_button) {
@@ -72,7 +75,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             $ui.append($btn_snapshot).append($btn_cancel);
 
             $btn_snapshot.on('click', function() { $this.data('snapshot')(); });
-            $btn_cancel  .on('click', function() { $this.data('close')(); });
+            $btn_cancel  .on('click', function() { $this.data('cancel')(); });
         }
 
         if (o.use_native_modal) {
