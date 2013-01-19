@@ -1,6 +1,6 @@
 var base_canvas,darken_canvas, f_canvas;
 var html5Crop = (function() {
-    var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y;
+    var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y, $ui;
 
     var setDot = function(dot_name, value) {
         var it = this;
@@ -116,25 +116,8 @@ var html5Crop = (function() {
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
             }, options);
-            //modal = supplant(
-                //"<div class='darken_bgr' style='display:none'>" +
-                    //"<div class='{modal_class}' style='position:fixed;'>" +
-                        //"<div style='position: relative'>" +
-                            //"<canvas></canvas>" +
-                            //"<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                            //"<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                        //"</div>" +
-                        //"<input type='button' name='crop' value='{cropname}'/>" +
-                        //"<input type='button' name='cancel' value='{cancel}'/>" +
-                    //"</div>" +
-                //"</div>", {
-                    //modal_class: o.modal_class,
-                    //cropname: o.CROP_NAME,
-                    //cancel: o.CANCEL
-                //}
-            //);
-            //$modal = $(modal);
 
+            var ui = 
             if (o.use_native_modal) {
                 $modal_blocker = $(supplant(
                     "<div class='darken_bgr' style='display:none'>" +
@@ -144,20 +127,20 @@ var html5Crop = (function() {
                                 "<canvas style='position:absolute; top:0; left:0'></canvas>" +
                                 "<canvas style='position:absolute; top:0; left:0'></canvas>" +
                             "</div>" +
-                            "<input type='button' name='crop' value='{cropname}'/>" +
-                            "<input type='button' name='cancel' value='{cancel}'/>" +
                         "</div>" +
                     "</div>", {
                         modal_class: o.modal_class,
-                        cropname: o.CROP_NAME,
-                        cancel: o.CANCEL
                     }));
 
                 $modal = $modal_blocker.find("." + o.modal_class);
             }
-
-            $btn_crop = $modal.find('input[name=crop]');
-            $btn_cancel = $modal.find('input[name=cancel]');
+            if (o.use_native_button) {
+                $btn_crop = 
+                    $(supplant("<input type='button' name='crop' value='{cropname}'/>", {cropname: o.CROP_NAME}));
+                $btn_cancel = 
+                    $(supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
+                $modal.append($btn_crop).append($btn_cancel);
+            }
 
             var $canvases = $modal.find('canvas');
             base_canvas   = $canvases[0];
@@ -342,20 +325,22 @@ var html5Crop = (function() {
             }
         },
         setButtonActions: function() {
-            $btn_crop.on('click', function() {
-                var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
-                var canvas = document.createElement('canvas');
-                canvas.width = Math.abs(dots.rt.x() - dots.lt.x());
-                canvas.height = Math.abs(dots.lb.y() - dots.lt.y());
-                canvas.getContext('2d').putImageData(im_data, 0, 0);
+            if (o.use_native_button) {
+                $btn_crop.on('click', function() {
+                    var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Math.abs(dots.rt.x() - dots.lt.x());
+                    canvas.height = Math.abs(dots.lb.y() - dots.lt.y());
+                    canvas.getContext('2d').putImageData(im_data, 0, 0);
 
-                var url = canvas.toDataURL();
-                o.oncrop && o.oncrop(url);
-                $modal_blocker.hide();
-            });
-            $btn_cancel.on('click', function() {
-                $modal_blocker.hide();
-            });
+                    var url = canvas.toDataURL();
+                    o.oncrop && o.oncrop(url);
+                    $modal_blocker.hide();
+                });
+                $btn_cancel.on('click', function() {
+                    $modal_blocker.hide();
+                });
+            }
         }
     }
 })();
