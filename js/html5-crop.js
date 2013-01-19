@@ -93,6 +93,19 @@ var html5Crop = (function() {
 
     };
 
+    var showNativeModal = function() {
+        $modal_blocker.show();
+        toCenter($modal);
+    }
+
+    var setUiToModal = function() {
+        if (o.use_native_modal) {
+            $modal.append($ui);
+            showNativeModal();
+        }
+        o.onDomCreated($ui);
+    }
+
     return {
         init: function(options) {
             o = $.extend({
@@ -113,24 +126,25 @@ var html5Crop = (function() {
                 use_native_modal: true,
                 use_native_button: true,
 
+                onDomCreated: function($ui) {},
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
             }, options);
 
-            var ui = 
+            $ui = $("<div>" +
+                        "<div style='position: relative'>" +
+                            "<canvas></canvas>" +
+                            "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                            "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                        "</div>" +
+                    "</div>");
+
             if (o.use_native_modal) {
                 $modal_blocker = $(supplant(
                     "<div class='darken_bgr' style='display:none'>" +
                         "<div class='{modal_class}' style='position:fixed;'>" +
-                            "<div style='position: relative'>" +
-                                "<canvas></canvas>" +
-                                "<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                                "<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                            "</div>" +
                         "</div>" +
-                    "</div>", {
-                        modal_class: o.modal_class,
-                    }));
+                    "</div>", {modal_class: o.modal_class}));
 
                 $modal = $modal_blocker.find("." + o.modal_class);
             }
@@ -139,10 +153,10 @@ var html5Crop = (function() {
                     $(supplant("<input type='button' name='crop' value='{cropname}'/>", {cropname: o.CROP_NAME}));
                 $btn_cancel = 
                     $(supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
-                $modal.append($btn_crop).append($btn_cancel);
+                $ui.append($btn_crop).append($btn_cancel);
             }
 
-            var $canvases = $modal.find('canvas');
+            var $canvases = $ui.find('canvas');
             base_canvas   = $canvases[0];
             darken_canvas = $canvases[1];
             f_canvas      = $canvases[2];
@@ -181,8 +195,11 @@ var html5Crop = (function() {
                 f_canvas.width = width;
                 f_canvas.height = height;
 
-                $modal_blocker.show();
-                toCenter($modal);
+                
+                setUiToModal();
+                //o.onDomCreated($ui);
+                //$modal_blocker.show();
+                //toCenter($modal);
                 setInitDotsValues(o.init_crop_side, width, height);
                 it.setActionHandlers(f_canvas);
                 it.draw();
