@@ -32,13 +32,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 supplant(
                     "<div>" +
                         "<div><video autoplay title='{pause}'></div>" +
-                        //"<input type='button' name='snapshot' value='{snapshot}'/>" +
-                        //"<input type='button' name='cancel' value='{cancel}'/>" +
-                    "</div>", {
-                        pause: o.CLICK_TO_PAUSE, 
-                        snapshot: o.TAKE_SNAPSHOT, 
-                        cancel: o.CANCEL
-                    });
+                    "</div>", { pause: o.CLICK_TO_PAUSE });
             $ui = $(ui);
 
         $this.data('snapshot', function() {

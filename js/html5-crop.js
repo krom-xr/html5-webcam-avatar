@@ -1,6 +1,6 @@
 var base_canvas,darken_canvas, f_canvas;
 var html5Crop = (function() {
-    var o, modal, $modal,   $btn_crop, $btn_cancel, freeze_x, freeze_y;
+    var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y;
 
     var setDot = function(dot_name, value) {
         var it = this;
@@ -100,33 +100,62 @@ var html5Crop = (function() {
                 CANCEL: 'отмена',
                 MIN_IMG_SIDE_ERROR: 'Слишком маленькое изображение по ширине или выстоте',
                 square_mode: true,
+
                 max_crop_side: 400,
                 min_crop_side: 50,
-                max_img_side: 800, // TODO
-                min_img_side: 100, // TODO
+
+                max_img_side: 400,
+                min_img_side: 100,
+
                 init_crop_side: 100,
                 dot_side: 10,
+
+                use_native_modal: true,
+                use_native_button: true,
+
                 modal_class: 'modal',
                 oncrop: function(cropped_url) {}
             }, options);
-            modal = supplant(
-                "<div class='darken_bgr' style='display:none'>" +
-                    "<div class='{modal_class}' style='position:fixed;'>" +
-                        "<div style='position: relative'>" +
-                            "<canvas></canvas>" +
-                            "<canvas style='position:absolute; top:0; left:0'></canvas>" +
-                            "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+            //modal = supplant(
+                //"<div class='darken_bgr' style='display:none'>" +
+                    //"<div class='{modal_class}' style='position:fixed;'>" +
+                        //"<div style='position: relative'>" +
+                            //"<canvas></canvas>" +
+                            //"<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                            //"<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                        //"</div>" +
+                        //"<input type='button' name='crop' value='{cropname}'/>" +
+                        //"<input type='button' name='cancel' value='{cancel}'/>" +
+                    //"</div>" +
+                //"</div>", {
+                    //modal_class: o.modal_class,
+                    //cropname: o.CROP_NAME,
+                    //cancel: o.CANCEL
+                //}
+            //);
+            //$modal = $(modal);
+
+            if (o.use_native_modal) {
+                $modal_blocker = $(supplant(
+                    "<div class='darken_bgr' style='display:none'>" +
+                        "<div class='{modal_class}' style='position:fixed;'>" +
+                            "<div style='position: relative'>" +
+                                "<canvas></canvas>" +
+                                "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                                "<canvas style='position:absolute; top:0; left:0'></canvas>" +
+                            "</div>" +
+                            "<input type='button' name='crop' value='{cropname}'/>" +
+                            "<input type='button' name='cancel' value='{cancel}'/>" +
                         "</div>" +
-                        "<input type='button' name='crop' value='{cropname}'/>" +
-                        "<input type='button' name='cancel' value='{cancel}'/>" +
-                    "</div>" +
-                "</div>", {
-                    modal_class: o.modal_class,
-                    cropname: o.CROP_NAME,
-                    cancel: o.CANCEL
-                }
-            );
-            $modal = $(modal);
+                    "</div>", {
+                        modal_class: o.modal_class,
+                        cropname: o.CROP_NAME,
+                        cancel: o.CANCEL
+                    }));
+
+                $modal = $modal_blocker.find("." + o.modal_class);
+            }
+
             $btn_crop = $modal.find('input[name=crop]');
             $btn_cancel = $modal.find('input[name=cancel]');
 
@@ -137,7 +166,7 @@ var html5Crop = (function() {
             this.setUrl(o.url);
             this.setButtonActions();
 
-            $('body').append($modal);
+            $('body').append($modal_blocker);
         },
         setUrl: function(url) {
             var it = this;
@@ -169,8 +198,8 @@ var html5Crop = (function() {
                 f_canvas.width = width;
                 f_canvas.height = height;
 
-                $modal.show();
-                toCenter($modal.find("." + o.modal_class));
+                $modal_blocker.show();
+                toCenter($modal);
                 setInitDotsValues(o.init_crop_side, width, height);
                 it.setActionHandlers(f_canvas);
                 it.draw();
@@ -322,10 +351,10 @@ var html5Crop = (function() {
 
                 var url = canvas.toDataURL();
                 o.oncrop && o.oncrop(url);
-                $modal.hide();
+                $modal_blocker.hide();
             });
             $btn_cancel.on('click', function() {
-                $modal.hide();
+                $modal_blocker.hide();
             });
         }
     }
