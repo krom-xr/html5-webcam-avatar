@@ -27,7 +27,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 onsnapshot: function(snapshot) {},
                 use_crop: true,
                 oncrop: function(cropped_url) {},
-                oncancel: function() {}
+                oncancel: function() {},
+                alertFn: function(msg) { alert(msg); },
                 
             },options),
             ui = 
@@ -110,12 +111,12 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
 
         $this.on('click', function() {
-            if (!navigator.getUserMedia) { alert(o.NOT_SUPPORT_FEATURE); return false; }
+            if (!navigator.getUserMedia) { o.alertFn(o.NOT_SUPPORT_FEATURE); return false; }
 
             navigator.getUserMedia && navigator.getUserMedia({video: true, audio: true}, function(_stream) {
                 stream = _stream;
                 video.src = window.URL.createObjectURL(stream);
-            }, function() { alert(o.CAMERA_NOT_FOUND); });
+            }, function() { o.alertFn(o.CAMERA_NOT_FOUND); });
         });
 
         return $this;

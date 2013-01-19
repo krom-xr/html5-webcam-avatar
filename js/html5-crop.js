@@ -129,6 +129,7 @@ var html5Crop = (function() {
                 onDomCreated: function($ui) {},
                 oncancel: function() {},
                 oncrop: function(cropped_url) {},
+                alertFn: function(msg) { alert(msg); },
 
                 modal_class: 'modal'
             }, options);
@@ -185,7 +186,7 @@ var html5Crop = (function() {
                     height = this.height;
                 }
                 if (width < o.min_img_side || height < o.min_img_side) {
-                    alert(o.MIN_IMG_SIDE_ERROR);
+                    o.alertFn(o.MIN_IMG_SIDE_ERROR);
                     return false;
                 };
 
