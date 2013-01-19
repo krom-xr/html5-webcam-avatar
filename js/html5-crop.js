@@ -127,8 +127,10 @@ var html5Crop = (function() {
                 use_native_button: true,
 
                 onDomCreated: function($ui) {},
-                modal_class: 'modal',
-                oncrop: function(cropped_url) {}
+                oncancel: function() {},
+                oncrop: function(cropped_url) {},
+
+                modal_class: 'modal'
             }, options);
 
             $ui = $("<div>" +
@@ -342,22 +344,26 @@ var html5Crop = (function() {
             }
         },
         setButtonActions: function() {
+            var it = this;
             if (o.use_native_button) {
-                $btn_crop.on('click', function() {
-                    var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
-                    var canvas = document.createElement('canvas');
-                    canvas.width = Math.abs(dots.rt.x() - dots.lt.x());
-                    canvas.height = Math.abs(dots.lb.y() - dots.lt.y());
-                    canvas.getContext('2d').putImageData(im_data, 0, 0);
-
-                    var url = canvas.toDataURL();
-                    o.oncrop && o.oncrop(url);
-                    $modal_blocker.hide();
-                });
-                $btn_cancel.on('click', function() {
-                    $modal_blocker.hide();
-                });
+                $btn_crop.on('click', function() { it.crop(); });
+                $btn_cancel.on('click', function() { it.cancel(); });
             }
+        },
+        crop: function() {
+            var im_data = base_canvas.getContext('2d').getImageData(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.abs(dots.rt.x() - dots.lt.x());
+            canvas.height = Math.abs(dots.lb.y() - dots.lt.y());
+            canvas.getContext('2d').putImageData(im_data, 0, 0);
+
+            var url = canvas.toDataURL();
+            o.oncrop && o.oncrop(url);
+            o.use_native_modal && $modal_blocker.hide();
+        },
+        cancel: function() { 
+            o.use_native_modal && $modal_blocker.hide(); 
+            o.oncancel();
         }
     }
 })();
