@@ -117,7 +117,7 @@ var html5Crop = (function() {
                 max_crop_side: 400,
                 min_crop_side: 50,
 
-                max_img_side: 400,
+                max_img_side: 600,
                 min_img_side: 100,
 
                 init_crop_side: 100,

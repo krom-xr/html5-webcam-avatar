@@ -19,7 +19,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 CLICK_TO_PAUSE: 'Нажмите для воспроизведения/остановки',
                 TAKE_SNAPSHOT: 'Сделать снимок',
                 CANCEL: 'Отмена',
-                max_video_size: 200,
+                max_video_size: 600,
                 modal_class: 'modal',
                 use_native_modal: true,
                 use_native_button: true,
@@ -50,13 +50,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             o.onsnapshot(data_url);
             if (o.use_crop) { 
-                //TODO receive options to html5Crop
-                html5Crop.init({
-                    url: data_url,
-                    oncrop: function(cropped_url) {
-                        o.oncrop(cropped_url);
-                    }
-                })
+                html5Crop.init($.extend({url: data_url}, o));
             }
         });
 
