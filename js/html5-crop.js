@@ -90,7 +90,6 @@ var html5Crop = (function() {
         dots.lb.x(x); dots.lb.y(y + side); 
         dots.rt.x(x + side); dots.rt.y(y); 
         dots.rb.x(x + side); dots.rb.y(y + side); 
-
     };
 
     var showNativeModal = function() {
@@ -269,6 +268,30 @@ var html5Crop = (function() {
                 sidey = getSideY(dot, y);
            
             dot.x(x); dot.y(y);
+
+            var out_x = checkXOutOfBorders();
+            if (out_x) {
+                var xside = getSideX(out_x.dot, out_x.dot.x());
+                if (out_x.compass == 'west') { 
+                    dots.lt.x(out_x.limit);         dots.lb.x(out_x.limit);
+                    dots.rt.x(out_x.limit + xside); dots.rb.x(out_x.limit + xside);
+                } else {
+                    dots.rt.x(out_x.limit);         dots.rb.x(out_x.limit);
+                    dots.lt.x(out_x.limit - xside); dots.lb.x(out_x.limit - xside);
+                }
+            }
+
+            var out_y = checkYOutOfBorders();
+            if (out_y) {
+                var yside = getSideY(out_y.dot, out_y.dot.y());
+                if (out_y.compass == 'north') { 
+                    dots.lt.y(out_y.limit);         dots.rt.y(out_y.limit);
+                    dots.lb.y(out_y.limit + yside); dots.rb.y(out_y.limit + yside);
+                } else {
+                    dots.lb.y(out_y.limit);         dots.rb.y(out_y.limit);
+                    dots.lt.y(out_y.limit - yside); dots.rt.y(out_y.limit - yside);
+                }
+            }
 
             if (o.max_crop_side) {
                 sidex >= o.max_crop_side && dot.x(getXLimit(dot, o.max_crop_side));
