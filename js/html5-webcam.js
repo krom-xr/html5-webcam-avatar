@@ -7,7 +7,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         var $this = $(this);
         if ($this.data("html5WebCam")) { 
             if (!typeof options === 'string') { return false; }
-            return $this.data(options)();
+            return $this.data(options) ? $this.data(options)() : html5Crop.crop();
         }
 
         $this.data("html5WebCam", true);
