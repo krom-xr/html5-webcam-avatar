@@ -24,6 +24,8 @@
                 modal: true,
                 close: function() { 
                     $shot_btn.html5WebCam('cancel');
+                    $("#snapshot_btn").button('enable');
+                    $("#crop_btn").button('disable');
                 },
                 buttons: [{
                         id: 'snapshot_btn',
@@ -37,6 +39,8 @@
                         id: 'crop_btn',
                         text: 'обрезать',
                         click: function() {
+                            $("#snapshot_btn").button('enable');
+                            $("#crop_btn").button('disable');
                             $shot_btn.html5WebCam('crop');
                             $(this).dialog('close');
                         },
