@@ -98,17 +98,17 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             o.onDomCreated($ui);
         }
 
-        $video.on('click', function() { video.paused ? video.play() : video.pause(); });
+        video.addEventListener('click', function() { video.paused ? video.play() : video.pause(); });
 
-        $video.one('play', function() { //NB this is hack. I dont now how to detect when video is loaded 
+        video.addEventListener('loadedmetadata',function() {
             if (o.max_video_size && (video.videoWidth > o.max_video_size || video.videoHeight > o.max_video_size)) {
                 video.videoWidth > video.videoHeight ?
                     $video.width(o.max_video_size) :
                     $video.height(o.max_video_size);
             }
             setUiToModal();
+            video.play();
         });
-
 
         $this.on('click', function() {
             if (!navigator.getUserMedia) { o.alertFn(o.NOT_SUPPORT_FEATURE); return false; }
