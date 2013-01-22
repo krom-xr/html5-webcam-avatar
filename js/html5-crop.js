@@ -169,10 +169,11 @@ var html5Crop = (function() {
         },
         setUrl: function(url) {
             var it = this;
-            var $img = $(supplant("<img src='{url}' >", {url: o.url}));
-            $img.on('load', function() { 
+            var img = document.createElement('img');
+            img.addEventListener('load', function() { 
                 var width  = this.width; 
                 var height = this.height;
+
                 if (width > o.max_img_side || height > o.max_img_side) {
                     if (width > height) {
                         this.width = o.max_img_side;
@@ -184,7 +185,9 @@ var html5Crop = (function() {
                     width = this.width;
                     height = this.height;
                 }
+
                 if (width < o.min_img_side || height < o.min_img_side) {
+                    console.log(width, height);
                     o.alertFn(o.MIN_IMG_SIDE_ERROR);
                     return false;
                 };
@@ -197,7 +200,6 @@ var html5Crop = (function() {
                 f_canvas.width = width;
                 f_canvas.height = height;
 
-                
                 setUiToModal();
                 //o.onDomCreated($ui);
                 //$modal_blocker.show();
@@ -205,8 +207,8 @@ var html5Crop = (function() {
                 setInitDotsValues(o.init_crop_side, width, height);
                 it.setActionHandlers(f_canvas);
                 it.draw();
-
             });
+            img.src = o.url;
         },
         draw: function() {
             var f_ctx = f_canvas.getContext('2d');
