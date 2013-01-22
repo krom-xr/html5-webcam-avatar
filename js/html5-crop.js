@@ -111,6 +111,7 @@ var html5Crop = (function() {
                 CROP_NAME: 'резать',
                 CANCEL: 'отмена',
                 MIN_IMG_SIDE_ERROR: 'Слишком маленькое изображение по ширине или выстоте',
+                CANVAS_NOT_SUPPORTED: 'canvas not supported in this browser',
                 square_mode: true,
 
                 max_crop_side: 400,
@@ -162,6 +163,12 @@ var html5Crop = (function() {
             base_canvas   = $canvases[0];
             darken_canvas = $canvases[1];
             f_canvas      = $canvases[2];
+
+            if (!base_canvas.getContext) {
+                o.alertFn(o.CANVAS_NOT_SUPPORTED);
+                return false;
+            }
+
             this.setUrl(o.url);
             this.setButtonActions();
 
@@ -170,7 +177,8 @@ var html5Crop = (function() {
         setUrl: function(url) {
             var it = this;
             var img = document.createElement('img');
-            img.addEventListener('load', function() { 
+            //img.addEventListener('load', function() { 
+            $(img).on('load', function() { 
                 var width  = this.width; 
                 var height = this.height;
 
