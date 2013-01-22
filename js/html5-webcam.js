@@ -46,7 +46,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             canvas.height = height;
             canvas.getContext('2d').drawImage(video, 0, 0, width, height);
             var data_url = canvas.toDataURL();
-            stream.stop();
+            video.pause();
+            try { stream.stop(); } catch (e) {};
             o.use_native_modal && $modal_blocker.hide();
 
             o.onsnapshot(data_url);
@@ -56,7 +57,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         });
 
         $this.data('cancel', function() {
-            stream.stop();
+            video.pause();
+            try { stream.stop(); } catch (e) {};
             o.use_native_modal && $modal_blocker.hide();
             o.oncancel();
         });
@@ -115,7 +117,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             navigator.getUserMedia && navigator.getUserMedia({video: true, audio: true}, function(_stream) {
                 stream = _stream;
-                video.src = window.URL.createObjectURL(stream);
+                video.src = window.URL ? window.URL.createObjectURL(stream) : stream; // in opera stream dont must be converted to objectURL
+                //video.src = window.URL.createObjectURL(_stream); // in opera stream dont must be converted to objectURL
+
             }, function() { o.alertFn(o.CAMERA_NOT_FOUND); });
         });
 
