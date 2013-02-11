@@ -54,16 +54,24 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
                 o.onsnapshot(data_url);
                 if (o.use_crop) {
-                    html5Crop.init(
-                        $.extend(
-                            $.extend({},o), {
-                                url: data_url,
-                                oncrop: function(cropped_url) {
-                                    o.oncrop.apply(it, [cropped_url]);
-                                }
-                            }
-                        )
-                    );
+                    var o_clone = $.extend({}, o);
+                    html5Crop.init($.extend(o_clone, {
+                        url: data_url,
+                        oncrop: function(cropped_url) {
+                            o.oncrop.apply(it, [cropped_url]);
+                            //$modal_blocker.hide();
+
+                        },
+                        //onDomCreated: function($html) {
+                            //if (o.use_native_modal) {
+                                //$modal.html('');
+                                //$modal.append($html);
+                                //showNativeModal();
+                            //}
+                            //o.onDomCreated.apply(it, [$html]);
+                        //}, 
+                        //use_native_modal: false
+                    }));
                 }
             });
 
@@ -105,6 +113,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             var setUiToModal = function() {
                 if (o.use_native_modal) {
+                    $modal.html('');
                     $modal.append($ui);
                     showNativeModal();
                 }
