@@ -1,4 +1,4 @@
-/*global exports*/
+/*global module*/
 /* позволяет делать всякие такие штуки - supplant("Hello {variable}", {variable: "World !"}) // return Hello World ! */
 var supplant = function (str, o) {
     return str.replace(/\{([^{}]*)\}/g,
@@ -28,15 +28,15 @@ var detect = function (iter_object, fn) {
     return result;
 };
 
-
 var toCenter = function($el) {
     $el.css('left', $(window).width()/2)
        .css('margin-left', -$el.width()/2 + 'px');
 
 };
 
-module.exports = {
+var utils = {
     supplant: supplant,
     detect: detect,
     toCenter: toCenter
 };
+if (typeof module !== 'undefined') { module.exports = utils; }

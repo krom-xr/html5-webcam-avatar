@@ -5,6 +5,7 @@ var base_canvas,darken_canvas, f_canvas;
 html5Crop = (function() {
     var utils = require('./common.js');
 
+
     var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y, $ui;
 
     var setDot = function(dot_name, value) {
