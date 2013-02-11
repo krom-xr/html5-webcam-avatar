@@ -1,9 +1,14 @@
-/*global alert, html5Crop, supplant, toCenter */
+/*global alert, require*/
 window.URL = window.URL || window.webkitURL;
 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
+var html5Crop = require("./html5-crop.js").html5Crop;
+window.html5Crop = html5Crop; //make html5crop - global
+
 (function($) {
+    var utils = require("./common.js");
+
     $.fn.html5WebCam = function(options) {
         $(this).each(function(){
             var $this = $(this), it = this;
@@ -35,7 +40,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     
                 },options),
                 ui = 
-                    supplant(
+                    utils.supplant(
                         "<div>" +
                             "<div><video autoplay title='{pause}'></div>" +
                         "</div>", { pause: o.CLICK_TO_PAUSE }),
@@ -88,9 +93,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             if (o.use_native_button) {
                 $btn_snapshot =
-                    $(supplant("<input type='button' name='snapshot' value='{snapshot}'/>", {snapshot: o.TAKE_SNAPSHOT}));
+                    $(utils.supplant("<input type='button' name='snapshot' value='{snapshot}'/>", {snapshot: o.TAKE_SNAPSHOT}));
                 $btn_cancel = 
-                    $(supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
+                    $(utils.supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
 
                 $ui.append($btn_snapshot).append($btn_cancel);
 
@@ -100,7 +105,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             }
 
             if (o.use_native_modal) {
-                $modal_blocker = $(supplant(
+                $modal_blocker = $(utils.supplant(
                                 "<div class='darken_bgr' style='display:none'>" +
                                     "<div class='{modal_class}' style='position:fixed;'></div>" +
                                 "</div>", {modal_class: o.modal_class}));
@@ -113,7 +118,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             var showNativeModal = function() {
                 $modal_blocker.show();
-                toCenter($modal);
+                utils.toCenter($modal);
             };
 
             var setUiToModal = function() {

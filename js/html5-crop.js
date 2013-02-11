@@ -1,6 +1,10 @@
-/*global detect, toCenter, supplant, alert */
+/*global detect, toCenter, supplant, alert,module , require */
+var html5Crop;
 var base_canvas,darken_canvas, f_canvas;
-var html5Crop = (function() {
+
+html5Crop = (function() {
+    var utils = require('./common.js');
+
     var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y, $ui;
 
     var setDot = function(dot_name, value) {
@@ -21,7 +25,7 @@ var html5Crop = (function() {
     };
 
     var getDotInThisPosition = function(x, y) {
-        return detect(dots, function(dot) {
+        return utils.detect(dots, function(dot) {
             return Boolean((dot.x() < x && x < (dot.x() + o.dot_side)) && (dot.y() < y && y < (dot.y() + o.dot_side)));
         });
     };
@@ -60,7 +64,7 @@ var html5Crop = (function() {
     var checkXOutOfBorders = function() {
         var min_limit = - o.dot_side/2,
             max_limit = base_canvas.width - o.dot_side/2,
-            dot = detect(dots, function(dot) {
+            dot = utils.detect(dots, function(dot) {
                 return dot.x() <= min_limit || dot.x() > max_limit;
             });
 
@@ -74,7 +78,7 @@ var html5Crop = (function() {
     var checkYOutOfBorders = function() {
         var min_limit = - o.dot_side/2,
             max_limit = base_canvas.height - o.dot_side/2,
-            dot = detect(dots, function(dot) {
+            dot = utils.detect(dots, function(dot) {
                 return dot.y() <= min_limit || dot.y() > max_limit;
             });
 
@@ -144,7 +148,7 @@ var html5Crop = (function() {
                     "</div>");
 
             if (o.use_native_modal) {
-                $modal_blocker = $(supplant(
+                $modal_blocker = $(utils.supplant(
                     "<div class='darken_bgr' style='display:none'>" +
                         "<div class='{modal_class}' style='position:fixed;'>" +
                         "</div>" +
@@ -154,9 +158,9 @@ var html5Crop = (function() {
             }
             if (o.use_native_button) {
                 $btn_crop = 
-                    $(supplant("<input type='button' name='crop' value='{cropname}'/>", {cropname: o.CROP_NAME}));
+                    $(utils.supplant("<input type='button' name='crop' value='{cropname}'/>", {cropname: o.CROP_NAME}));
                 $btn_cancel = 
-                    $(supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
+                    $(utils.supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
                 $ui.append($btn_crop).append($btn_cancel);
             }
 
@@ -273,7 +277,7 @@ var html5Crop = (function() {
         moveDot: function(x, y, old_x, old_y) {
             x = x - o.dot_side/2;
             y = y - o.dot_side/2;
-            var dot = detect(dots, function(_dot) { return _dot.active; }),
+            var dot = utils.detect(dots, function(_dot) { return _dot.active; }),
                 sidex = getSideX(dot, x),
                 sidey = getSideY(dot, y);
            
@@ -401,3 +405,6 @@ var html5Crop = (function() {
         }
     };
 })();
+module.exports = {
+    html5Crop: html5Crop
+};

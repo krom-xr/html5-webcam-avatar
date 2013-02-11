@@ -1,3 +1,4 @@
+/*global exports*/
 /* позволяет делать всякие такие штуки - supplant("Hello {variable}", {variable: "World !"}) // return Hello World ! */
 var supplant = function (str, o) {
     return str.replace(/\{([^{}]*)\}/g,
@@ -34,3 +35,8 @@ var toCenter = function($el) {
 
 };
 
+module.exports = {
+    supplant: supplant,
+    detect: detect,
+    toCenter: toCenter
+};
