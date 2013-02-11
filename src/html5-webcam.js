@@ -3,11 +3,11 @@ window.URL = window.URL || window.webkitURL;
 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-var html5Crop = require("./html5-crop.js").html5Crop;
-window.html5Crop = html5Crop; //make html5crop - global
-
 (function($) {
     var utils = require("./common.js");
+    var html5Crop = require("./html5-crop.js").html5Crop;
+    window.html5Crop = html5Crop; //make html5crop - global
+
 
     $.fn.html5WebCam = function(options) {
         $(this).each(function(){
@@ -47,18 +47,15 @@ window.html5Crop = html5Crop; //make html5crop - global
                 $ui = $(ui);
 
             $this.data('snapshot', function() {
-                var canvas = document.createElement('canvas');
-                var width = $video.width();
-                var height = $video.height();
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext('2d').drawImage(video, 0, 0, width, height);
-                var data_url = canvas.toDataURL();
-                video.pause();
-                try { stream.stop(); } catch (e) {}
+                var data_url = video.paused ? $video.data('data-url') : getSnapshotDataUrl();
+
+                video.pause(); // stop streming in opera
+                try { stream.stop(); } catch (e) {} // stop streaming in other browsers
+
                 o.use_native_modal && $modal_blocker.hide();
 
                 o.onsnapshot(data_url);
+
                 if (o.use_crop) {
                     var o_clone = $.extend({}, o);
                     html5Crop.init($.extend(o_clone, {
@@ -66,7 +63,6 @@ window.html5Crop = html5Crop; //make html5crop - global
                         oncrop: function(cropped_url) {
                             o.oncrop.apply(it, [cropped_url]);
                             $modal_blocker.hide();
-
                         },
                         onDomCreated: function($html) {
                             if (o.use_native_modal) {
@@ -130,7 +126,25 @@ window.html5Crop = html5Crop; //make html5crop - global
                 o.onDomCreated($ui);
             };
 
-            video.addEventListener('click', function() { video.paused ? video.play() : video.pause(); });
+            var getSnapshotDataUrl = function() {
+                var canvas = document.createElement('canvas'),
+                    w = $video.width(),
+                    h = $video.height();
+
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+                return canvas.toDataURL();
+            };
+
+            video.addEventListener('click', function() { 
+                if (video.paused) {
+                    video.play();
+                } else {
+                    $video.data('data-url', getSnapshotDataUrl());
+                    video.pause();
+                }
+            });
 
             video.addEventListener('loadedmetadata',function() {
                 if (o.max_video_size && (video.videoWidth > o.max_video_size || video.videoHeight > o.max_video_size)) {
