@@ -71,7 +71,10 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                             }
                             o.onDomCreated.apply(it, [$html]);
                         }, 
-                        use_native_modal: false
+                        use_native_modal: false,
+                        oncancel: function() {
+                            $this.data('cancel')();
+                        }
                     }));
                 }
             });
