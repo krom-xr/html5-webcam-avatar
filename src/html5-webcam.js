@@ -159,10 +159,13 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             $this.on('click', function() {
                 if (!navigator.getUserMedia) { o.alertFn(o.NOT_SUPPORT_FEATURE); return false; }
 
-                navigator.getUserMedia && navigator.getUserMedia({video: true, audio: true}, function(_stream) {
+                navigator.getUserMedia && navigator.getUserMedia({video: true}, function(_stream) {
                     stream = _stream;
-                    video.src = window.URL ? window.URL.createObjectURL(stream) : stream; // in opera stream dont must be converted to objectURL
-                    //video.src = window.URL.createObjectURL(_stream); // in opera stream dont must be converted to objectURL
+                    try {
+                        video.src = window.URL.createObjectURL(stream); 
+                    } catch (e) {
+                        video.src = stream;// in opera and firefox stream dont must be converted to objectURL
+                    }
 
                 }, function() { o.alertFn(o.CAMERA_NOT_FOUND); });
             });
