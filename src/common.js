@@ -1,4 +1,5 @@
-/*global module*/
+/*global module, require */
+
 /* позволяет делать всякие такие штуки - supplant("Hello {variable}", {variable: "World !"}) // return Hello World ! */
 var supplant = function (str, o) {
     return str.replace(/\{([^{}]*)\}/g,
@@ -39,4 +40,4 @@ var utils = {
     detect: detect,
     toCenter: toCenter
 };
-if (typeof module !== 'undefined') { module.exports = utils; }
+module.exports = utils;
