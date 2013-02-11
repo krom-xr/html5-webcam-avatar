@@ -7,6 +7,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
     $.fn.html5WebCam = function(options) {
         $(this).each(function(){
             var $this = $(this), it = this;
+
             if ($this.data("html5WebCam")) { 
                 if (typeof options !== 'string') { return false; }
                 return $this.data(options) ? $this.data(options)() : html5Crop.crop();
@@ -59,18 +60,18 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                         url: data_url,
                         oncrop: function(cropped_url) {
                             o.oncrop.apply(it, [cropped_url]);
-                            //$modal_blocker.hide();
+                            $modal_blocker.hide();
 
                         },
-                        //onDomCreated: function($html) {
-                            //if (o.use_native_modal) {
-                                //$modal.html('');
-                                //$modal.append($html);
-                                //showNativeModal();
-                            //}
-                            //o.onDomCreated.apply(it, [$html]);
-                        //}, 
-                        //use_native_modal: false
+                        onDomCreated: function($html) {
+                            if (o.use_native_modal) {
+                                $modal.children().detach();
+                                $modal.append($html);
+                                showNativeModal();
+                            }
+                            o.onDomCreated.apply(it, [$html]);
+                        }, 
+                        use_native_modal: false
                     }));
                 }
             });
@@ -90,7 +91,8 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
                 $ui.append($btn_snapshot).append($btn_cancel);
 
-                $btn_snapshot.on('click', function() { $this.data('snapshot')(); });
+                $btn_snapshot.on('click', function() { 
+                    $this.data('snapshot')(); });
                 $btn_cancel  .on('click', function() { $this.data('cancel')(); });
             }
 
@@ -113,7 +115,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             var setUiToModal = function() {
                 if (o.use_native_modal) {
-                    $modal.html('');
+                    $modal.children().detach();
                     $modal.append($ui);
                     showNativeModal();
                 }
