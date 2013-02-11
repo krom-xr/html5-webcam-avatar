@@ -1,3 +1,4 @@
+/*global alert, html5Crop, supplant, toCenter */
 window.URL = window.URL || window.webkitURL;
 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -6,7 +7,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
     $.fn.html5WebCam = function(options) {
         var $this = $(this);
         if ($this.data("html5WebCam")) { 
-            if (!typeof options === 'string') { return false; }
+            if (typeof options !== 'string') { return false; }
             return $this.data(options) ? $this.data(options)() : html5Crop.crop();
         }
 
@@ -28,14 +29,14 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 use_crop: true,
                 oncrop: function(cropped_url) {},
                 oncancel: function() {},
-                alertFn: function(msg) { alert(msg); },
+                alertFn: function(msg) { alert(msg); }
                 
             },options),
             ui = 
                 supplant(
                     "<div>" +
                         "<div><video autoplay title='{pause}'></div>" +
-                    "</div>", { pause: o.CLICK_TO_PAUSE });
+                    "</div>", { pause: o.CLICK_TO_PAUSE }),
             $ui = $(ui);
 
         $this.data('snapshot', function() {
@@ -47,18 +48,18 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             canvas.getContext('2d').drawImage(video, 0, 0, width, height);
             var data_url = canvas.toDataURL();
             video.pause();
-            try { stream.stop(); } catch (e) {};
+            try { stream.stop(); } catch (e) {}
             o.use_native_modal && $modal_blocker.hide();
 
             o.onsnapshot(data_url);
-            if (o.use_crop) { 
+            if (o.use_crop) {
                 html5Crop.init($.extend({url: data_url}, o));
             }
         });
 
         $this.data('cancel', function() {
             video.pause();
-            try { stream.stop(); } catch (e) {};
+            try { stream.stop(); } catch (e) {}
             o.use_native_modal && $modal_blocker.hide();
             o.oncancel();
         });
@@ -90,7 +91,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         var showNativeModal = function() {
             $modal_blocker.show();
             toCenter($modal);
-        }
+        };
 
         var setUiToModal = function() {
             if (o.use_native_modal) {
@@ -98,7 +99,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 showNativeModal();
             }
             o.onDomCreated($ui);
-        }
+        };
 
         video.addEventListener('click', function() { video.paused ? video.play() : video.pause(); });
 

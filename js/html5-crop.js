@@ -1,3 +1,4 @@
+/*global detect, toCenter, supplant, alert */
 var base_canvas,darken_canvas, f_canvas;
 var html5Crop = (function() {
     var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y, $ui;
@@ -10,12 +11,12 @@ var html5Crop = (function() {
             //if (freeze_y && $.inArray(dot_name, ['lt_y', 'lb_y', 'rt_y', 'rb_y']) != -1) { return it[dot_name]; }
             it[dot_name] = value !== undefined ? value : it[dot_name];
             return it[dot_name];
-        }
-    }
+        };
+    };
 
     var dots = {
         lt: {x: setDot('lt_x'),   y: setDot('lt_y')}, rt: {x: setDot('rt_x'), y: setDot('rt_y')},
-        lb: {x: setDot('lb_x'),   y: setDot('lb_y')}, rb: {x: setDot('rb_x'), y: setDot('rb_y')},
+        lb: {x: setDot('lb_x'),   y: setDot('lb_y')}, rb: {x: setDot('rb_x'), y: setDot('rb_y')}
 
     };
 
@@ -26,8 +27,8 @@ var html5Crop = (function() {
     };
 
     var isPositionInArea = function(x, y) {
-        return (dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side)
-            && (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side );
+        return (dots.lt.x() < x && x < dots.rt.x() + o.dot_side || dots.rt.x() < x && x < dots.lt.x() + o.dot_side) &&
+               (dots.lt.y() < y && y < dots.lb.y() + o.dot_side || dots.lb.y() < y && y < dots.lt.y() + o.dot_side );
     };
 
     var setActiveDot = function(dot) {
@@ -35,13 +36,13 @@ var html5Crop = (function() {
     };
 
     var getXLimit = function(dot, limit_size) {
-        return dot == dots.lt || dot == dots.lb
-            ? dots.rt.x() - limit_size : dots.lt.x() + limit_size;
+        return dot == dots.lt || dot == dots.lb ?
+            dots.rt.x() - limit_size : dots.lt.x() + limit_size;
     };
 
     var getYLimit= function(dot, limit_size) {
-        return dot == dots.lt || dot == dots.rt
-            ? dots.lb.y() - limit_size : dots.lt.y() + limit_size;
+        return dot == dots.lt || dot == dots.rt ?
+            dots.lb.y() - limit_size : dots.lt.y() + limit_size;
     };
 
     var getSideX = function(dot, x) {
@@ -67,7 +68,7 @@ var html5Crop = (function() {
         var compass = dot.x() <= 0 ? 'west' : 'east',
             limit = compass == 'west' ? min_limit: max_limit;
 
-        return {dot: dot, compass: compass , limit: limit}
+        return {dot: dot, compass: compass , limit: limit};
     };
 
     var checkYOutOfBorders = function() {
@@ -81,7 +82,7 @@ var html5Crop = (function() {
         var compass = dot.y() <= 0 ? 'north' : 'south',
             limit = compass == 'north' ? min_limit: max_limit;
 
-        return {dot: dot, compass: compass , limit: limit}
+        return {dot: dot, compass: compass , limit: limit};
     };
 
     var setInitDotsValues = function(side, w, h) {
@@ -95,7 +96,7 @@ var html5Crop = (function() {
     var showNativeModal = function() {
         $modal_blocker.show();
         toCenter($modal);
-    }
+    };
 
     var setUiToModal = function() {
         if (o.use_native_modal) {
@@ -103,7 +104,7 @@ var html5Crop = (function() {
             showNativeModal();
         }
         o.onDomCreated($ui);
-    }
+    };
 
     return {
         init: function(options) {
@@ -195,10 +196,9 @@ var html5Crop = (function() {
                 }
 
                 if (width < o.min_img_side || height < o.min_img_side) {
-                    console.log(width, height);
                     o.alertFn(o.MIN_IMG_SIDE_ERROR);
                     return false;
-                };
+                }
 
                 base_canvas.width = width;
                 base_canvas.height = height;
@@ -399,5 +399,5 @@ var html5Crop = (function() {
             o.use_native_modal && $modal_blocker.hide(); 
             o.oncancel();
         }
-    }
+    };
 })();
