@@ -16,3 +16,7 @@ html5 webcam avatar for modern browsers
     });
     
 [demo & docs](http://html5-xr.herokuapp.com)
+
+browser support
+    Chrome 24 +
+    Opera 12.14 +
