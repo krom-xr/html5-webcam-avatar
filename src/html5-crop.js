@@ -36,28 +36,28 @@ html5Crop = (function() {
     };
 
     var setActiveDot = function(dot) {
-        $.each(dots, function(i, _dot) { _dot.active = _dot == dot; });
+        $.each(dots, function(i, _dot) { _dot.active = _dot === dot; });
     };
 
     var getXLimit = function(dot, limit_size) {
-        return dot == dots.lt || dot == dots.lb ?
+        return dot === dots.lt || dot === dots.lb ?
             dots.rt.x() - limit_size : dots.lt.x() + limit_size;
     };
 
     var getYLimit= function(dot, limit_size) {
-        return dot == dots.lt || dot == dots.rt ?
+        return dot === dots.lt || dot === dots.rt ?
             dots.lb.y() - limit_size : dots.lt.y() + limit_size;
     };
 
     var getSideX = function(dot, x) {
         var x1 = x;
-        var x2 = (dots.lt == dot || dots.lb == dot) ? dots.rt.x() : dots.lt.x();
+        var x2 = (dots.lt === dot || dots.lb === dot) ? dots.rt.x() : dots.lt.x();
         return Math.abs(x1-x2);
     };
 
     var getSideY = function(dot, y) {
         var y1 = y;
-        var y2 = (dots.lt == dot || dots.rt == dot) ? dots.lb.y() : dots.lt.y();
+        var y2 = (dots.lt === dot || dots.rt === dot) ? dots.lb.y() : dots.lt.y();
         return Math.abs(y1-y2);
     };
 
@@ -70,7 +70,7 @@ html5Crop = (function() {
 
         if (!dot) { return false; }
         var compass = dot.x() <= 0 ? 'west' : 'east',
-            limit = compass == 'west' ? min_limit: max_limit;
+            limit = compass === 'west' ? min_limit: max_limit;
 
         return {dot: dot, compass: compass , limit: limit};
     };
@@ -84,17 +84,17 @@ html5Crop = (function() {
 
         if (!dot) { return false; }
         var compass = dot.y() <= 0 ? 'north' : 'south',
-            limit = compass == 'north' ? min_limit: max_limit;
+            limit = compass === 'north' ? min_limit: max_limit;
 
         return {dot: dot, compass: compass , limit: limit};
     };
 
     var setInitDotsValues = function(side, w, h) {
         var x = w/2 - side/2, y = h/2 - side/2;
-        dots.lt.x(x); dots.lt.y(y); 
-        dots.lb.x(x); dots.lb.y(y + side); 
-        dots.rt.x(x + side); dots.rt.y(y); 
-        dots.rb.x(x + side); dots.rb.y(y + side); 
+        dots.lt.x(x); dots.lt.y(y);
+        dots.lb.x(x); dots.lb.y(y + side);
+        dots.rt.x(x + side); dots.rt.y(y);
+        dots.rb.x(x + side); dots.rb.y(y + side);
     };
 
     var showNativeModal = function() {
@@ -157,9 +157,9 @@ html5Crop = (function() {
                 $modal = $modal_blocker.find("." + o.modal_class);
             }
             if (o.use_native_button) {
-                $btn_crop = 
+                $btn_crop =
                     $(utils.supplant("<input type='button' name='crop' value='{cropname}'/>", {cropname: o.CROP_NAME}));
-                $btn_cancel = 
+                $btn_cancel =
                     $(utils.supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
                 $ui.append($btn_crop).append($btn_cancel);
             }
@@ -182,9 +182,9 @@ html5Crop = (function() {
         setUrl: function(url) {
             var it = this;
             var img = document.createElement('img');
-            //img.addEventListener('load', function() { 
-            $(img).on('load', function() { 
-                var width  = this.width; 
+            //img.addEventListener('load', function() {
+            $(img).on('load', function() {
+                var width  = this.width;
                 var height = this.height;
 
                 if (width > o.max_img_side || height > o.max_img_side) {
@@ -229,9 +229,9 @@ html5Crop = (function() {
             f_ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
             f_ctx.strokeStyle = '#000';
 
-            $.each(dots, function(i, dot) { 
-                f_ctx.fillRect(dot.x(), dot.y(), o.dot_side, o.dot_side); 
-                f_ctx.strokeRect(dot.x(), dot.y(), o.dot_side, o.dot_side); 
+            $.each(dots, function(i, dot) {
+                f_ctx.fillRect(dot.x(), dot.y(), o.dot_side, o.dot_side);
+                f_ctx.strokeRect(dot.x(), dot.y(), o.dot_side, o.dot_side);
             });
 
             var d_ctx = darken_canvas.getContext('2d');
@@ -241,7 +241,7 @@ html5Crop = (function() {
             d_ctx.clearRect(dots.lt.x() + o.dot_side/2, dots.lt.y() + o.dot_side/2, dots.rt.x() - dots.lt.x(), dots.lb.y() - dots.lt.y());
         },
         moveArea: function(x, y, old_x, old_y) {
-            var diff_x = old_x - x; 
+            var diff_x = old_x - x;
             var diff_y = old_y - y;
             $.each(dots, function(i, dot) {
                 dot.x(dot.x() - diff_x);
@@ -251,7 +251,7 @@ html5Crop = (function() {
             var out_x = checkXOutOfBorders();
             if (out_x) {
                 var xside = getSideX(out_x.dot, out_x.dot.x());
-                if (out_x.compass == 'west') { 
+                if (out_x.compass === 'west') {
                     dots.lt.x(out_x.limit);         dots.lb.x(out_x.limit);
                     dots.rt.x(out_x.limit + xside); dots.rb.x(out_x.limit + xside);
                 } else {
@@ -263,7 +263,7 @@ html5Crop = (function() {
             var out_y = checkYOutOfBorders();
             if (out_y) {
                 var yside = getSideY(out_y.dot, out_y.dot.y());
-                if (out_y.compass == 'north') { 
+                if (out_y.compass === 'north') {
                     dots.lt.y(out_y.limit);         dots.rt.y(out_y.limit);
                     dots.lb.y(out_y.limit + yside); dots.rb.y(out_y.limit + yside);
                 } else {
@@ -286,7 +286,7 @@ html5Crop = (function() {
             var out_x = checkXOutOfBorders();
             if (out_x) {
                 var xside = getSideX(out_x.dot, out_x.dot.x());
-                if (out_x.compass == 'west') { 
+                if (out_x.compass === 'west') {
                     dots.lt.x(out_x.limit);         dots.lb.x(out_x.limit);
                     dots.rt.x(out_x.limit + xside); dots.rb.x(out_x.limit + xside);
                 } else {
@@ -298,7 +298,7 @@ html5Crop = (function() {
             var out_y = checkYOutOfBorders();
             if (out_y) {
                 var yside = getSideY(out_y.dot, out_y.dot.y());
-                if (out_y.compass == 'north') { 
+                if (out_y.compass === 'north') {
                     dots.lt.y(out_y.limit);         dots.rt.y(out_y.limit);
                     dots.lb.y(out_y.limit + yside); dots.rb.y(out_y.limit + yside);
                 } else {
@@ -324,10 +324,10 @@ html5Crop = (function() {
                 }
             }
 
-            if (dot == dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); } 
-            if (dot == dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); } 
-            if (dot == dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); } 
-            if (dot == dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); } 
+            if (dot === dots.lt) { dots.rt.y(dot.y()); dots.lb.x(dot.x()); }
+            if (dot === dots.rb) { dots.rt.x(dot.x()); dots.lb.y(dot.y()); }
+            if (dot === dots.rt) { dots.lt.y(dot.y()); dots.rb.x(dot.x()); }
+            if (dot === dots.lb) { dots.lt.x(dot.x()); dots.rb.y(dot.y()); }
 
             this.draw();
         },
@@ -339,7 +339,7 @@ html5Crop = (function() {
 
             $(canvas).on('mousedown', function(e) {
                 target = it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY);
-                if (target == 'dot') {
+                if (target === 'dot') {
                     setActiveDot(getDotInThisPosition(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY));
                 }
                 drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
@@ -347,21 +347,21 @@ html5Crop = (function() {
 
             });
             $(canvas).on('mousemove', function(e) {
-                if (drag) { 
-                    if (target == 'dot') {
+                if (drag) {
+                    if (target === 'dot') {
                         it.moveDot(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
-                    } else if (target == 'area') {
+                    } else if (target === 'area') {
                         it.moveArea(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY, drag_position.x, drag_position.y);
                         drag_position = {x: e.offsetX || e.originalEvent.layerX, y: e.offsetY || e.originalEvent.layerY};
                     }
                 } else {
-                    it.setCursor(canvas, 
+                    it.setCursor(canvas,
                         it.getTarget(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY),
                         getDotInThisPosition(e.offsetX || e.originalEvent.layerX, e.offsetY || e.originalEvent.layerY));
                 }
             });
-            $(canvas).on('mouseup', function() { 
-                target = false; 
+            $(canvas).on('mouseup', function() {
+                target = false;
                 drag = false;
             });
         },
@@ -370,12 +370,12 @@ html5Crop = (function() {
             return getDotInThisPosition(x, y) ? 'dot' : isPositionInArea(x, y) ? "area" : false;
         },
         setCursor: function(canvas, target, dot) {
-            if (target == 'dot') {
-                if (dot == dots.lt) { $(canvas).css('cursor', 'nw-resize'); }
-                if (dot == dots.rt) { $(canvas).css('cursor', 'ne-resize'); }
-                if (dot == dots.rb) { $(canvas).css('cursor', 'se-resize'); }
-                if (dot == dots.lb) { $(canvas).css('cursor', 'sw-resize'); }
-            } else if (target == 'area') {
+            if (target === 'dot') {
+                if (dot === dots.lt) { $(canvas).css('cursor', 'nw-resize'); }
+                if (dot === dots.rt) { $(canvas).css('cursor', 'ne-resize'); }
+                if (dot === dots.rb) { $(canvas).css('cursor', 'se-resize'); }
+                if (dot === dots.lb) { $(canvas).css('cursor', 'sw-resize'); }
+            } else if (target === 'area') {
                 $(canvas).css('cursor', 'pointer');
             } else {
                 $(canvas).css('cursor', 'default');
@@ -399,8 +399,8 @@ html5Crop = (function() {
             o.oncrop && o.oncrop(url);
             o.use_native_modal && $modal_blocker.hide();
         },
-        cancel: function() { 
-            o.use_native_modal && $modal_blocker.hide(); 
+        cancel: function() {
+            o.use_native_modal && $modal_blocker.hide();
             o.oncancel();
         }
     };

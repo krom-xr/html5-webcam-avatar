@@ -13,7 +13,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         $(this).each(function(){
             var $this = $(this), it = this;
 
-            if ($this.data("html5WebCam")) { 
+            if ($this.data("html5WebCam")) {
                 if (typeof options !== 'string') { return false; }
                 return $this.data(options) ? $this.data(options)() : html5Crop.crop();
             }
@@ -39,7 +39,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     alertFn: function(msg) { alert(msg); }
                     
                 },options),
-                ui = 
+                ui =
                     utils.supplant(
                         "<div>" +
                             "<div><video autoplay title='{pause}'></div>" +
@@ -71,7 +71,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                                 showNativeModal();
                             }
                             o.onDomCreated.apply(it, [$html]);
-                        }, 
+                        },
                         use_native_modal: false,
                         oncancel: function() {
                             $this.data('cancel')();
@@ -90,12 +90,12 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
             if (o.use_native_button) {
                 $btn_snapshot =
                     $(utils.supplant("<input type='button' name='snapshot' value='{snapshot}'/>", {snapshot: o.TAKE_SNAPSHOT}));
-                $btn_cancel = 
+                $btn_cancel =
                     $(utils.supplant("<input type='button' name='cancel' value='{cancel}'/>", {cancel: o.CANCEL}));
 
                 $ui.append($btn_snapshot).append($btn_cancel);
 
-                $btn_snapshot.on('click', function() { 
+                $btn_snapshot.on('click', function() {
                     $this.data('snapshot')(); });
                 $btn_cancel  .on('click', function() { $this.data('cancel')(); });
             }
@@ -137,7 +137,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 return canvas.toDataURL();
             };
 
-            video.addEventListener('click', function() { 
+            video.addEventListener('click', function() {
                 if (video.paused) {
                     video.play();
                 } else {
@@ -162,7 +162,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 navigator.getUserMedia && navigator.getUserMedia({video: true}, function(_stream) {
                     stream = _stream;
                     try {
-                        video.src = window.URL.createObjectURL(stream); 
+                        video.src = window.URL.createObjectURL(stream);
                     } catch (e) {
                         video.src = stream;// in opera and firefox stream dont must be converted to objectURL
                     }
