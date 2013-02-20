@@ -28,7 +28,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     TAKE_SNAPSHOT: 'Сделать снимок',
                     CANCEL: 'Отмена',
                     max_video_size: 600,
-                    modal_class: 'modal',
+                    modal_class: 'html5-webcam-avatar-modal',
                     use_native_modal: true,
                     use_native_button: true,
                     onDomCreated: function($html) { },
@@ -102,7 +102,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             if (o.use_native_modal) {
                 $modal_blocker = $(utils.supplant(
-                                "<div class='darken_bgr' style='display:none'>" +
+                                "<div class='html5-webcam-avatar-modal-wrapper' style='display:none'>" +
                                     "<div class='{modal_class}' style='position:fixed;'></div>" +
                                 "</div>", {modal_class: o.modal_class}));
                 $modal = $modal_blocker.find("." + o.modal_class);

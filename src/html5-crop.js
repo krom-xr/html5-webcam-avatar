@@ -136,7 +136,7 @@ html5Crop = (function() {
                 oncrop: function(cropped_url) {},
                 alertFn: function(msg) { alert(msg); },
 
-                modal_class: 'modal'
+                modal_class: 'html5-webcam-avatar-modal'
             }, options);
 
             $ui = $("<div>" +
@@ -149,7 +149,7 @@ html5Crop = (function() {
 
             if (o.use_native_modal) {
                 $modal_blocker = $(utils.supplant(
-                    "<div class='darken_bgr' style='display:none'>" +
+                    "<div class='html5-webcam-avatar-modal-wrapper' style='display:none'>" +
                         "<div class='{modal_class}' style='position:fixed;'>" +
                         "</div>" +
                     "</div>", {modal_class: o.modal_class}));
