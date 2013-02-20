@@ -3,7 +3,7 @@ window.URL = window.URL || window.webkitURL;
 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-(function($) {
+(function($, utils) {
     window.html5Crop = html5Crop; //make html5crop global
 
     $.fn.html5WebCam = function(options) {
@@ -170,4 +170,11 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
         });
         return this;
     };
-})(jQuery);
+})(jQuery, utils);
+
+
+
+//if utils was exist before this script 
+//we save it in this variable. 
+//Now restore utils
+if (qwerwretertyasdffdasasdffdtr) { utils = qwerwretertyasdffdasasdffdtr; console.log('variable utils was restored from qwerwretertyasdffdasasdffdtr name'); }

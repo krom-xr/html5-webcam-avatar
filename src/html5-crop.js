@@ -1,9 +1,11 @@
-/*global detect, toCenter, alert*/
-var html5Crop;
-var base_canvas, darken_canvas, f_canvas;
+/*global alert*/
 
-html5Crop = (function() {
-    var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y, $ui;
+var html5Crop = (function(utils) {
+    var o,
+        base_canvas, darken_canvas, f_canvas,
+        modal, $modal, $modal_blocker, 
+        $btn_crop, $btn_cancel, 
+        freeze_x, freeze_y, $ui;
 
     var setDot = function(dot_name, value) {
         var it = this;
@@ -402,4 +404,4 @@ html5Crop = (function() {
             o.oncancel();
         }
     };
-})();
+})(utils);
