@@ -1,4 +1,4 @@
-/*global module, require */
+/*global module */
 
 /* позволяет делать всякие такие штуки - supplant("Hello {variable}", {variable: "World !"}) // return Hello World ! */
 var supplant = function (str, o) {

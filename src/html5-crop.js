@@ -1,4 +1,4 @@
-/*global detect, toCenter, supplant, alert,module , require */
+/*global detect, toCenter, alert,module , require */
 var html5Crop;
 var base_canvas,darken_canvas, f_canvas;
 
