@@ -1,10 +1,9 @@
-/*global detect, toCenter, alert,module , require */
+/*global detect, toCenter, alert, module , require */
 var html5Crop;
-var base_canvas,darken_canvas, f_canvas;
+var base_canvas, darken_canvas, f_canvas;
 
 html5Crop = (function() {
-    var utils = require('./common.js');
-
+    var utils = require('./utils.js') || utils;
 
     var o, modal, $modal, $modal_blocker, $btn_crop, $btn_cancel, freeze_x, freeze_y, $ui;
 

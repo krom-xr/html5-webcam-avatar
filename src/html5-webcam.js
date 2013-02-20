@@ -4,9 +4,9 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                           navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 (function($) {
-    var utils = require("./common.js");
+    var utils = require("./utils.js");
     var html5Crop = require("./html5-crop.js").html5Crop;
-    window.html5Crop = html5Crop; //make html5crop - global
+    window.html5Crop = html5Crop; //make html5crop global
 
 
     $.fn.html5WebCam = function(options) {
