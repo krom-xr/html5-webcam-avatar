@@ -3,7 +3,6 @@ html5-webcam-avatar
 
 html5 webcam avatar for modern browsers 
 
-
     $(document).ready(function() {
         $("#create_snapshot").html5WebCam({
             oncrop: function(cropped_url) { 
@@ -20,3 +19,4 @@ html5 webcam avatar for modern browsers
 browser support
     Chrome 24 +
     Opera 12.14 +
+    Firefox 19.0 +

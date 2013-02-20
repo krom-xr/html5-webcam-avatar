@@ -1,10 +1,9 @@
-/*global alert*/
-
+/*global utils*/
 var html5Crop = (function(utils) {
     var o,
         base_canvas, darken_canvas, f_canvas,
-        modal, $modal, $modal_blocker, 
-        $btn_crop, $btn_cancel, 
+        modal, $modal, $modal_blocker,
+        $btn_crop, $btn_cancel,
         freeze_x, freeze_y, $ui;
 
     var setDot = function(dot_name, value) {
@@ -99,7 +98,7 @@ var html5Crop = (function(utils) {
 
     var showNativeModal = function() {
         $modal_blocker.show();
-        toCenter($modal);
+        utils.toCenter($modal);
     };
 
     var setUiToModal = function() {

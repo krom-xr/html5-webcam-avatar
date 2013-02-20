@@ -1,3 +1,4 @@
+if (!console) { console = {log: function() {}};}
 var qwerwretertyasdffdasasdffdtr;
 if (utils) { qwerwretertyasdffdasasdffdtr = utils; console.log('variable utils was saved as qwerwretertyasdffdasasdffdtr name'); } // if utils isset, save utils as temp name
 
@@ -43,4 +44,4 @@ var utils = {};
         detect: detect,
         toCenter: toCenter
     };
-})(utils)
+})(utils);
