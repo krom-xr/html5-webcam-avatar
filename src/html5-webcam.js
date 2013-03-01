@@ -144,7 +144,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                 }
             });
 
-            video.addEventListener('loadedmetadata',function() {
+            video.addEventListener('loadeddata',function() {
                 if (o.max_video_size && (video.videoWidth > o.max_video_size || video.videoHeight > o.max_video_size)) {
                     video.videoWidth > video.videoHeight ?
                         $video.width(o.max_video_size) :
