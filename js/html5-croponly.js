@@ -475,7 +475,10 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
                 oncancel: function() {},
                 alertFn: function(msg) {
                     alert(msg);
-                }
+                },
+                use_preloader: true,
+                PRELOAD_TEXT: "loading...",
+                CONFIRM_PERMISSION: "Система ожидает вашего решения.\nПодтвердите или запретите использование web-камеры."
             }, options), ui = utils.supplant("<div>" + "<div><video autoplay title='{pause}'></div>" + "</div>", {
                 pause: o.CLICK_TO_PAUSE
             }), $ui = $(ui);
@@ -568,7 +571,7 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
                     video.pause();
                 }
             });
-            video.addEventListener("loadedmetadata", function() {
+            video.addEventListener("loadeddata", function() {
                 if (o.max_video_size && (video.videoWidth > o.max_video_size || video.videoHeight > o.max_video_size)) {
                     video.videoWidth > video.videoHeight ? $video.width(o.max_video_size) : $video.height(o.max_video_size);
                 }
@@ -580,6 +583,12 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
                     o.alertFn(o.NOT_SUPPORT_FEATURE);
                     return false;
                 }
+                var container_fn = $this.is("input") ? $this.val : $this.text, temp_val = container_fn.apply($this);
+                if (container_fn.apply($this) === o.PRELOAD_TEXT) {
+                    o.alertFn(o.CONFIRM_PERMISSION);
+                    return false;
+                }
+                container_fn.apply($this, [ o.PRELOAD_TEXT ]);
                 navigator.getUserMedia && navigator.getUserMedia({
                     video: true
                 }, function(_stream) {
@@ -589,8 +598,10 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
                     } catch (e) {
                         video.src = stream;
                     }
+                    container_fn.apply($this, [ temp_val ]);
                 }, function() {
                     o.alertFn(o.CAMERA_NOT_FOUND);
+                    container_fn.apply($this, [ temp_val ]);
                 });
             });
         });
