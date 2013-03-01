@@ -31,7 +31,10 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     use_crop: true,
                     oncrop: function(cropped_url) {},
                     oncancel: function() {},
-                    alertFn: function(msg) { alert(msg); }
+                    alertFn: function(msg) { alert(msg); },
+                    use_preloader: true,
+                    PRELOAD_TEXT: 'loading...',
+                    CONFIRM_PERMISSION: 'Система ожидает вашего решения.\nПодтвердите или запретите использование web-камеры.'
                     
                 },options),
                 ui =
@@ -153,6 +156,15 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 
             $this.on('click', function() {
                 if (!navigator.getUserMedia) { o.alertFn(o.NOT_SUPPORT_FEATURE); return false; }
+                var container_fn = $this.is('input') ? $this.val : $this.text,
+                    temp_val = container_fn.apply($this);
+
+                if (container_fn.apply($this) === o.PRELOAD_TEXT) {
+                    o.alertFn(o.CONFIRM_PERMISSION);
+                    return false;
+                }
+
+                container_fn.apply($this, [o.PRELOAD_TEXT]);
 
                 navigator.getUserMedia && navigator.getUserMedia({video: true}, function(_stream) {
                     stream = _stream;
@@ -161,8 +173,11 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
                     } catch (e) {
                         video.src = stream;// in opera and firefox stream dont must be converted to objectURL
                     }
-
-                }, function() { o.alertFn(o.CAMERA_NOT_FOUND); });
+                    container_fn.apply($this, [temp_val]);
+                }, function() {
+                    o.alertFn(o.CAMERA_NOT_FOUND);
+                    container_fn.apply($this, [temp_val]);
+                });
             });
 
         });
